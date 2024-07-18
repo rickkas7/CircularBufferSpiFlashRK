@@ -3,7 +3,11 @@
 
 #include "Particle.h"
 
+#ifndef UNITTEST
 #include "SpiFlashRK.h"
+#else
+#include "SpiFlashTester.h"
+#endif
 
 class CircularBufferSpiFlashRK {
 public:
