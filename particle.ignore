@@ -1,0 +1,5 @@
+.vscode/**/*.*
+docs/**/*.*
+images/**/*.*
+more-examples/**/*.*
+automated-test/**/*.*
