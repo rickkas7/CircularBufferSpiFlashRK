@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "CircularBufferSpiFlashRK.h"
+#include "SpiFlashTester.h"
 
 void runTest();
 
