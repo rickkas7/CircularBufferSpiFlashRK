@@ -20,12 +20,7 @@ int main(int argc, char *argv[]) {
 
 void runTest() {
 
-    Log.info("jedecId=%06lx", (unsigned long) spiFlash.jedecIdRead());
-
-	if (!spiFlash.isValid()) {
-		Log.error("no valid flash chip");
-		return;
-	}
+    runTestSuite(&spiFlash);
 
 }
 

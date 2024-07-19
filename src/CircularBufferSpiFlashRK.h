@@ -14,6 +14,10 @@ public:
     CircularBufferSpiFlashRK(SpiFlash *spiFlash, size_t addrStart, size_t addrEnd);
     virtual ~CircularBufferSpiFlashRK();
 
+    bool load();
+
+    bool erase();
+
 
     struct SectorHeader {
         uint32_t sectorMagic;

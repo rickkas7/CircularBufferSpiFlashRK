@@ -85,6 +85,15 @@ public:
 	 */
 	void resetDevice() {};
 
+    /**
+	 * @brief Gets the page size (default: 256)
+	 */
+	inline size_t getPageSize() const { return pageSize; };
+
+	/**
+	 * @brief Gets the sector size (default: 4096)
+	 */
+	inline size_t getSectorSize() const { return sectorSize; };
 
     size_t pageSize = 256;
     size_t sectorSize = 4096;

@@ -12,12 +12,12 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 SpiFlashMacronix spiFlash(SPI, A4);
 // SpiFlashWinbond spiFlash(SPI1, D5);
 
-const std::chrono::milliseconds testRunPeriod = 30s;
+const std::chrono::milliseconds testRunPeriod = 5min;
 unsigned long testRunLast = 0;
 
-void testRun();
-
 void setup() {
+    waitFor(Serial.isConnected, 10000); delay(2000);
+
 	spiFlash.begin();
 
     // Particle.connect();
@@ -27,16 +27,7 @@ void loop() {
     if (testRunLast == 0 || millis() - testRunLast >= testRunPeriod.count()) {
         testRunLast = millis();
 
-        testRun();
+        runTestSuite(&spiFlash);
     }
 }
 
-void testRun() {
-    Log.info("jedecId=%06lx", spiFlash.jedecIdRead());
-
-	if (!spiFlash.isValid()) {
-		Log.error("no valid flash chip");
-		return;
-	}
-
-}
