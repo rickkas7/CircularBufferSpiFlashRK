@@ -41,14 +41,16 @@ void test01(SpiFlash *spiFlash) {
     }
 
     // Check NOR flash semantics (can only set bit to 0)
-    tempBuf[0] = 0;
-    tempBuf[1] = 0xff;
-    spiFlash->writeData(startAddr, tempBuf, 2);
+    tempBuf[0] = 0; // writes over 0x00
+    tempBuf[1] = 0; // writes over 0x01
+    tempBuf[2] = 0xff; // writes over 0x02
+    spiFlash->writeData(startAddr, tempBuf, 3);
 
     memset(tempBuf, 0xff, sizeof(tempBuf));
     expectedBuf[0] = 0;
-    expectedBuf[1] = 1;
-    spiFlash->readData(startAddr, tempBuf, 2);
+    expectedBuf[1] = 0;
+    expectedBuf[2] = 2;
+    spiFlash->readData(startAddr, tempBuf, 3);
     for(size_t ii = 0; ii < 2; ii++) {
         if (tempBuf[ii] != expectedBuf[ii]) {
                 Log.error("test failed ii=%d value=0x%02x expected=0x%02x line=%d", (int)ii, (int)tempBuf[ii], (int)expectedBuf[ii], (int)__LINE__);
@@ -56,9 +58,15 @@ void test01(SpiFlash *spiFlash) {
         }
     }
 
+    spiFlash->sectorErase(startAddr);
+
+    circBuf.load();
 
 
     Log.info("test01 completed!");
+}
+
+void test02(SpiFlash *spiFlash) {
 }
 
 void runTestSuite(SpiFlash *spiFlash) {
