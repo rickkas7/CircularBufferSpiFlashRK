@@ -13,7 +13,6 @@
 
 class CircularBufferSpiFlashRK {
 public:
-
     struct RecordHeader {
         uint32_t recordMagic;
         uint16_t size;
@@ -52,6 +51,12 @@ public:
 
     bool writeSectorHeader(uint16_t sectorNum, bool erase, uint32_t sequence);
 
+    bool appendToSector(Sector &sector, const void *data, size_t dataLen, uint16_t flags, bool write);
+
+    uint16_t getLastOffset(const Sector &sector) const;
+
+    void logSector(const Sector &sector, const char *msg) const;
+
     /**
      * @brief Convert a sector number to an address
      * 
@@ -66,9 +71,11 @@ public:
     static const uint32_t SECTOR_FLAG_FINALIZED_MASK = 0x0002;
 
     static const uint32_t RECORD_MAGIC = 0x26793787;
+    static const uint32_t RECORD_MAGIC_ERASED = 0xffffffff;
     static const uint16_t RECORD_FLAG_DELETED_MASK = 0x0001;
 
-    // a4 17 a9 66 
+    static const uint32_t UNUSED_MAGIC = 0xa417a966;
+
 
 #ifndef UNITTEST
     /**
@@ -102,6 +109,15 @@ protected:
     size_t addrStart;
     size_t addrEnd;
     size_t sectorCount; //!< Calculated in constructor, number of sectors from addrStart to addrEnd
+
+
+    Sector currentReadSector;
+    Sector currentWriteSector;
+    int firstSector = -1;
+    uint32_t firstSectorSequence = 0;
+
+    int lastSector = -1;
+    uint32_t lastSectorSequence = 0;
 
     /**
      * @brief Mutex to protect shared resources
