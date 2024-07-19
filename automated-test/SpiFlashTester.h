@@ -5,11 +5,14 @@
 
 class SpiFlash {
 public:
+    SpiFlash(uint8_t *buffer, size_t size);
+
+    void begin() {};
 
 	/**
 	 * @brief Returns true if there is a flash chip present and it appears to be the correct manufacturer code.
 	 */
-	bool isValid();
+	bool isValid() { return true; };
 
 	/**
 	 * @brief Gets the JEDEC ID for the flash device.
@@ -20,22 +23,12 @@ public:
 	 * byte[1] device ID 1     mask 0x0000ff00
 	 * byte[2] device ID 2     mask 0x000000ff
 	 */
-	uint32_t jedecIdRead();
-
-	/**
-	 * @brief Reads the status register
-	 */
-	uint8_t readStatus();
-
-	/**
-	 * @brief Reads the configuration register (RDCR)
-	 */
-	uint8_t readConfiguration();
+	uint32_t jedecIdRead() { return 0x123456; };
 
 	/**
 	 * @brief Checks the status register and returns true if a write is in progress
 	 */
-	bool isWriteInProgress();
+	bool isWriteInProgress() { return false; };
 
 	/**
 	 * @brief Waits for any pending write operations to complete
@@ -43,12 +36,12 @@ public:
 	 * Waits up to waitWriteCompletionTimeoutMs milliseconds (default: 500) if
 	 * not specified or 0. Otherwise, waits the specified number of milliseconds.
 	 */
-	void waitForWriteComplete(unsigned long timeout = 0);
+	void waitForWriteComplete(unsigned long timeout = 0) {};
 
 	/**
 	 * @brief Writes the status register.
 	 */
-	void writeStatus(uint8_t status);
+	void writeStatus(uint8_t status) {}
 
 	/**
 	 * @brief Reads data synchronously. Reads data correctly across page boundaries.
@@ -78,17 +71,6 @@ public:
 	void sectorErase(size_t addr);
 
 	/**
-	 * @brief Erases a block. Blocks are 64K (65536 bytes) or 16 sectors. There are 16 blocks on a 1 MByte device.
-	 *
-	 * This call blocks for the duration of the erase, which take take some time (up to 1 second).
-	 * This call is not in the base API because the P1 does not support it. SPIFFS doesn't need it for operation
-	 * and uses sector erase.
-	 *
-	 * @param addr Address of the beginning of the block
-	 */
-	void blockErase(size_t addr);
-
-	/**
 	 * @brief Erases the entire chip.
 	 *
 	 * This call blocks for the duration of the erase, which take take some time (several secoonds). This function
@@ -101,6 +83,12 @@ public:
 	 *
 	 * Winbond devices support this, ISSI devices do not.
 	 */
-	void resetDevice();
+	void resetDevice() {};
 
+
+    size_t pageSize = 256;
+    size_t sectorSize = 4096;
+
+    uint8_t *buffer;
+    size_t size;
 };
