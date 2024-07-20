@@ -10,33 +10,41 @@
 #endif
 
 #include <vector>
+#include <deque>
 
 class CircularBufferSpiFlashRK {
 public:
-    struct RecordHeader {
-        uint32_t recordMagic;
+    struct RecordCommon {
         uint16_t size;
         uint16_t flags;
+    };
+
+    struct RecordHeader {
+        uint32_t recordMagic;
+        RecordCommon c;
     };
 
     struct Record {
         size_t offset;
-        uint16_t size;
-        uint16_t flags;
+        RecordCommon c;
     };
 
-    struct SectorHeader {
-        uint32_t sectorMagic;
+    struct SectorCommon {
         uint32_t sequence;
         uint16_t flags;
         uint16_t reserved;
     };
 
+    struct SectorHeader {
+        uint32_t sectorMagic;
+        SectorCommon c;
+    };
+
     struct Sector {
         uint16_t sectorNum;
-        uint16_t flags;
-        uint32_t sequence;
+        uint16_t internalFlags;
         std::vector<Record> records;
+        SectorCommon c;
     };
 
 
@@ -46,6 +54,9 @@ public:
     bool load();
 
     bool erase();
+
+    Sector *getSector(uint16_t sectorNum);
+
 
     bool readSector(uint16_t sectorNum, Sector &sector);
 
@@ -69,6 +80,7 @@ public:
     static const uint32_t SECTOR_MAGIC = 0x0ceb6443;
     static const uint32_t SECTOR_FLAG_HEADER_MASK = 0x0001;
     static const uint32_t SECTOR_FLAG_FINALIZED_MASK = 0x0002;
+    static const uint32_t SECTOR_FLAG_DELETED_MASK = 0x0004;
 
     static const uint32_t RECORD_MAGIC = 0x26793787;
     static const uint32_t RECORD_MAGIC_ERASED = 0xffffffff;
@@ -76,6 +88,7 @@ public:
 
     static const uint32_t UNUSED_MAGIC = 0xa417a966;
 
+    static const size_t SECTOR_CACHE_SIZE = 10;
 
 #ifndef UNITTEST
     /**
@@ -111,13 +124,15 @@ protected:
     size_t sectorCount; //!< Calculated in constructor, number of sectors from addrStart to addrEnd
 
 
-    Sector currentReadSector;
-    Sector currentWriteSector;
+    Sector *currentReadSector = nullptr;
+    Sector *currentWriteSector = nullptr;
     int firstSector = -1;
     uint32_t firstSectorSequence = 0;
 
     int lastSector = -1;
     uint32_t lastSectorSequence = 0;
+
+    std::deque<Sector*> sectorCache;
 
     /**
      * @brief Mutex to protect shared resources

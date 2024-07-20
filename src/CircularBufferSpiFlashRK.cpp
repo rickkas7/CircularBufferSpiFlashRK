@@ -1,10 +1,5 @@
 #include "CircularBufferSpiFlashRK.h"
 
-struct SectorScanData {
-    uint32_t sequence;
-    uint32_t flags;
-};
-
 CircularBufferSpiFlashRK::CircularBufferSpiFlashRK(SpiFlash *spiFlash, size_t addrStart, size_t addrEnd) :
     spiFlash(spiFlash), addrStart(addrStart), addrEnd(addrEnd) {
 
@@ -27,7 +22,7 @@ CircularBufferSpiFlashRK::~CircularBufferSpiFlashRK() {
 }
 
 bool CircularBufferSpiFlashRK::load() {
-    SectorScanData *scanData = new SectorScanData[sectorCount];
+    SectorCommon *scanData = new SectorCommon[sectorCount];
     if (!scanData) {
         Log.error("could not allocate scanData sectorCount=%d", (int)sectorCount);
         return false;
@@ -44,18 +39,17 @@ bool CircularBufferSpiFlashRK::load() {
 
         spiFlash->readData(addrStart + sectorIndex * spiFlash->getSectorSize(), &sectorHeader, sizeof(SectorHeader));
         if (sectorHeader.sectorMagic == SECTOR_MAGIC) {
-            scanData[sectorIndex].sequence = sectorHeader.sequence;
-            scanData[sectorIndex].flags = sectorHeader.flags;
+            scanData[sectorIndex] = sectorHeader.c;
 
-            Log.trace("loading sectorIndex=%d sequence=%d flags=0x%x", sectorIndex, (int)sectorHeader.sequence, (int)sectorHeader.flags);
+            Log.trace("loading sectorIndex=%d sequence=%d flags=0x%x", sectorIndex, (int)sectorHeader.c.sequence, (int)sectorHeader.c.flags);
 
-            if (firstSector < 0 || sectorHeader.sequence < firstSectorSequence) {
+            if (firstSector < 0 || sectorHeader.c.sequence < firstSectorSequence) {
                 firstSector = sectorIndex;
-                firstSectorSequence = sectorHeader.sequence ;
+                firstSectorSequence = sectorHeader.c.sequence ;
             }
-            if (lastSector < 0 || sectorHeader.sequence > lastSectorSequence) {
+            if (lastSector < 0 || sectorHeader.c.sequence > lastSectorSequence) {
                 lastSector = sectorIndex;
-                lastSectorSequence = sectorHeader.sequence ;
+                lastSectorSequence = sectorHeader.c.flags ;
             }
         }
     }
@@ -66,14 +60,15 @@ bool CircularBufferSpiFlashRK::load() {
         firstSectorSequence = lastSectorSequence = 1;
         writeSectorHeader(firstSector, true, firstSectorSequence);
     }
-    
+
+    /*    
     Log.trace("firstSector=%d firstSectorSequence=%d lastSector=%d lastSectorSequence=%d", firstSector, (int)firstSectorSequence, lastSector, (int)lastSectorSequence);
     readSector(firstSector, currentReadSector);
     logSector(currentReadSector, "firstSector");
 
 
     readSector(lastSector, currentWriteSector);
-     
+     */
 
     return true;
 }
@@ -86,9 +81,42 @@ bool CircularBufferSpiFlashRK::erase() {
     return true;
 }
 
+CircularBufferSpiFlashRK::Sector *CircularBufferSpiFlashRK::getSector(uint16_t sectorNum) {
+    CircularBufferSpiFlashRK::Sector *pSector = nullptr;
+    sectorNum %= sectorCount;
+
+    if (currentReadSector && currentReadSector->sectorNum == sectorNum) {
+        pSector = currentReadSector;
+    }
+    else
+    if (currentWriteSector && currentWriteSector->sectorNum == sectorNum) {
+        pSector = currentReadSector;
+    }
+
+    for(auto iter = sectorCache.begin(); iter != sectorCache.end(); iter++) {
+        if ((*iter)->sectorNum == sectorNum) {
+            // Found in cache
+            pSector = *iter;
+            break;
+        }
+    }
+    if (!pSector) {
+        // Not found in cache
+        if (sectorCache.size() >= SECTOR_CACHE_SIZE) {
+            delete sectorCache.back();
+            sectorCache.pop_back();
+        }
+        pSector = new Sector();
+
+        
+    }
+
+    return pSector;
+}
+
+
 
 bool CircularBufferSpiFlashRK::readSector(uint16_t sectorNum, Sector &sector) {
-    sectorNum %= sectorCount;
 
     size_t addr = sectorNumToAddr(sectorNum);
 
@@ -101,8 +129,8 @@ bool CircularBufferSpiFlashRK::readSector(uint16_t sectorNum, Sector &sector) {
     }
     
     sector.sectorNum = sectorNum;
-    sector.flags = sectorHeader.flags;
-    sector.sequence = sectorHeader.sequence;
+    sector.internalFlags = 0;
+    sector.c = sectorHeader.c;
     sector.records.clear(); 
 
     // Read records
@@ -121,20 +149,19 @@ bool CircularBufferSpiFlashRK::readSector(uint16_t sectorNum, Sector &sector) {
             return false;
         }
 
-        if (recordHeader.size >= (spiFlash->getSectorSize() - sizeof(RecordHeader) - sizeof(SectorHeader))) {
-            Log.error("readSector invalid size sectorNum=%d offset=%d size=%d", (int)sectorNum, (int)offset, (int)recordHeader.size);
+        if (recordHeader.c.size >= (spiFlash->getSectorSize() - sizeof(RecordHeader) - sizeof(SectorHeader))) {
+            Log.error("readSector invalid size sectorNum=%d offset=%d size=%d", (int)sectorNum, (int)offset, (int)recordHeader.c.size);
             return false;
         }
 
-        uint16_t nextOffset = offset + sizeof(RecordHeader) + recordHeader.size;
+        uint16_t nextOffset = offset + sizeof(RecordHeader) + recordHeader.c.size;
         if (nextOffset > spiFlash->getSectorSize()) {
-            Log.error("readSector invalid offset sectorNum=%d offset=%d size=%d", (int)sectorNum, (int)offset, (int)recordHeader.size);
+            Log.error("readSector invalid offset sectorNum=%d offset=%d size=%d", (int)sectorNum, (int)offset, (int)recordHeader.c.size);
             return false;
         }
         Record record;
         record.offset = offset;
-        record.size = recordHeader.size;
-        record.flags = recordHeader.flags;
+        record.c = recordHeader.c;
         sector.records.push_back(record);
 
         offset = nextOffset;
@@ -154,9 +181,9 @@ bool CircularBufferSpiFlashRK::writeSectorHeader(uint16_t sectorNum, bool erase,
 
     SectorHeader sectorHeader;
     sectorHeader.sectorMagic = SECTOR_MAGIC;
-    sectorHeader.sequence = sequence;    
-    sectorHeader.flags = (uint16_t) ~SECTOR_FLAG_HEADER_MASK; // 0xfffe
-    sectorHeader.reserved = (uint16_t) ~0;
+    sectorHeader.c.sequence = sequence;    
+    sectorHeader.c.flags = (uint16_t) ~SECTOR_FLAG_HEADER_MASK; // 0xfffe
+    sectorHeader.c.reserved = (uint16_t) ~0;
     spiFlash->writeData(addr, &sectorHeader, sizeof(SectorHeader));
 
     return true;
@@ -175,17 +202,16 @@ bool CircularBufferSpiFlashRK::appendToSector(Sector &sector, const void *data, 
 
     Record record;
     record.offset = offset;
-    record.flags = flags;
-    record.size = dataLen;
+    record.c.flags = flags;
+    record.c.size = dataLen;
     sector.records.push_back(record);
 
     if (write) {
         RecordHeader recordHeader;
         recordHeader.recordMagic = RECORD_MAGIC;
-        recordHeader.flags = flags;
-        recordHeader.size = dataLen;
-
+        recordHeader.c = record.c;
         spiFlash->writeData(addr + offset, &recordHeader, sizeof(RecordHeader));
+
         spiFlash->writeData(addr + offset + sizeof(RecordHeader), data, dataLen);
     }
 
@@ -195,7 +221,7 @@ bool CircularBufferSpiFlashRK::appendToSector(Sector &sector, const void *data, 
 uint16_t CircularBufferSpiFlashRK::getLastOffset(const Sector &sector) const {
     uint16_t lastOffset = sizeof(SectorHeader);
     for(auto iter = sector.records.begin(); iter != sector.records.end(); iter++) {
-        lastOffset = iter->offset + iter->size;
+        lastOffset = iter->offset + iter->c.size;
     }
     return lastOffset;
 }
@@ -203,10 +229,10 @@ uint16_t CircularBufferSpiFlashRK::getLastOffset(const Sector &sector) const {
 void CircularBufferSpiFlashRK::logSector(const Sector &sector, const char *msg) const {
     uint16_t lastOffset = getLastOffset(sector);
 
-    Log.trace("logSector %s sectorNum=%d flags=0x%x sequence=%d lastOffset=%d", msg, (int)sector.sectorNum, (int)sector.flags, (int)sector.sequence, (int)lastOffset); 
+    Log.trace("logSector %s sectorNum=%d flags=0x%x sequence=%d lastOffset=%d", msg, (int)sector.sectorNum, (int)sector.c.flags, (int)sector.c.sequence, (int)lastOffset); 
 
     for(auto iter = sector.records.begin(); iter != sector.records.end(); iter++) {
-        Log.trace(" record offset=%d size=%d flags=%x", (int)iter->offset, (int)iter->size, (int)iter->flags);        
+        Log.trace(" record offset=%d size=%d flags=%x", (int)iter->offset, (int)iter->c.size, (int)iter->c.flags);        
     }
 }
 
