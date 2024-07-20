@@ -325,17 +325,24 @@ void CircularBufferSpiFlashRK::DataBuffer::free() {
 void CircularBufferSpiFlashRK::DataBuffer::copy(const void *buf, size_t len) {
     free();
 
-    if (len > 0) {
-        this->buf = new uint8_t[len];
-        if (this->buf) {
-            memcpy(this->buf, buf, len);
+    if (buf) {
+        if (len > 0) {
+            this->buf = new uint8_t[len];
+            if (this->buf) {
+                memcpy(this->buf, buf, len);
+            }
         }
+        this->len = len;
     }
-    this->len = len;
 }
 
 void CircularBufferSpiFlashRK::DataBuffer::copy(const char *str) {
-    copy(str, strlen(str) + 1);
+    if (str) {
+        copy(str, strlen(str) + 1);
+    }
+    else {
+        free();
+    }
 }
 
 
@@ -365,5 +372,14 @@ const char *CircularBufferSpiFlashRK::DataBuffer::c_str() const {
     }
     else {
         return (const char *)buf;
+    }
+}
+
+uint8_t CircularBufferSpiFlashRK::DataBuffer::get(size_t index) const {
+    if (buf && index < len) {
+        return buf[index];
+    }
+    else {
+        return 0;
     }
 }

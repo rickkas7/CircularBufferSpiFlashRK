@@ -37,8 +37,31 @@ void testDataBuffer() {
         assert(!t.equals("testing!"));
         assert(!t.equals("testin"));
 
+        assert(strcmp(t.c_str(), "testing") == 0);
+
         CircularBufferSpiFlashRK::DataBuffer t2(t);
         assert(t == t2);
+
+        t2.copy("different");
+        assert(t != t2);
+    }
+
+    {
+        uint8_t b1[4] = { 2, 3, 0, 1 };
+
+        CircularBufferSpiFlashRK::DataBuffer t(b1, sizeof(b1));
+
+        assert(t.size() == 4);
+        assert(t.get(0) == (const uint8_t)2);
+        assert(t.get(1) == 3);
+        assert(t.get(2) == 0);
+        assert(t.get(3) == 1);
+
+
+        CircularBufferSpiFlashRK::DataBuffer t2(t);
+        assert(t == t2);
+
+
 
     }
 }
