@@ -40,11 +40,52 @@ public:
         SectorCommon c;
     };
 
-    struct Sector {
-        uint16_t sectorNum;
-        uint16_t internalFlags;
+    class Sector {
+    public:
+        void clear(uint16_t sectorNum = 0);
+
+        uint16_t getLastOffset() const;
+
+        void log(const char *msg, bool includeData = false) const;
+
+
+        uint16_t sectorNum = 0;
+        uint16_t internalFlags = 0;
         std::vector<Record> records;
         SectorCommon c;
+    };
+
+    class DataBuffer {
+    public:
+        DataBuffer();
+        virtual ~DataBuffer();
+
+        DataBuffer(const void *buf, size_t len);
+
+        DataBuffer(const DataBuffer &other);
+        DataBuffer &operator=(const DataBuffer &other);
+
+        DataBuffer(const char *str);
+
+        size_t size() const { return buf ? len : 0; };
+
+        void free();
+
+        void copy(const void *buf, size_t len);
+        void copy(const char *str);
+
+        bool operator==(const DataBuffer &other) const;
+        bool equals(const char *str) const;
+
+        const char *c_str() const;
+
+        operator const char *() const { return c_str(); };
+
+
+
+    protected:
+        uint8_t *buf;
+        size_t len;
     };
 
 
@@ -58,15 +99,12 @@ public:
     Sector *getSector(uint16_t sectorNum);
 
 
-    bool readSector(uint16_t sectorNum, Sector &sector);
+    bool readSector(uint16_t sectorNum, Sector *sector);
 
     bool writeSectorHeader(uint16_t sectorNum, bool erase, uint32_t sequence);
 
-    bool appendToSector(Sector &sector, const void *data, size_t dataLen, uint16_t flags, bool write);
+    bool appendToSector(Sector *sector, const void *data, size_t dataLen, uint16_t flags, bool write);
 
-    uint16_t getLastOffset(const Sector &sector) const;
-
-    void logSector(const Sector &sector, const char *msg) const;
 
     /**
      * @brief Convert a sector number to an address
@@ -78,9 +116,14 @@ public:
 
 
     static const uint32_t SECTOR_MAGIC = 0x0ceb6443;
+    static const uint32_t SECTOR_MAGIC_ERASED = 0xffffffff;
     static const uint32_t SECTOR_FLAG_HEADER_MASK = 0x0001;
     static const uint32_t SECTOR_FLAG_FINALIZED_MASK = 0x0002;
     static const uint32_t SECTOR_FLAG_DELETED_MASK = 0x0004;
+
+    static const uint32_t SECTOR_INTERNAL_FLAG_ERASED = 0x0001;
+    static const uint32_t SECTOR_INTERNAL_FLAG_CORRUPTED = 0x0002;
+    static const uint32_t SECTOR_INTERNAL_FLAG_VALID = 0x8000;
 
     static const uint32_t RECORD_MAGIC = 0x26793787;
     static const uint32_t RECORD_MAGIC_ERASED = 0xffffffff;
