@@ -207,11 +207,6 @@ public:
         uint16_t flags;
     };
 
-    struct Record {
-        size_t offset; // Offset of the beginning of RecordCommon, not offset of data!
-        RecordCommon c;
-    };
-
     struct SectorCommon { // 8 bytes
         uint32_t sequence;
         uint16_t flags;
@@ -233,7 +228,7 @@ public:
 
         uint16_t sectorNum = 0;
         uint16_t internalFlags = 0;
-        std::vector<Record> records;
+        std::vector<RecordCommon> records;
         SectorCommon c;
     };
 

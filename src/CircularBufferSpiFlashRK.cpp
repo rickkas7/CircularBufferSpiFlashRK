@@ -176,10 +176,7 @@ bool CircularBufferSpiFlashRK::readSector(uint16_t sectorNum, Sector *sector) {
             _log.error("readSector invalid offset sectorNum=%d offset=%d size=%d", (int)sectorNum, (int)offset, (int)recordCommon.size);
             return false;
         }
-        Record record;
-        record.offset = offset;
-        record.c = recordCommon;
-        sector->records.push_back(record);
+        sector->records.push_back(recordCommon);
 
         offset = nextOffset;
     }
@@ -233,14 +230,12 @@ bool CircularBufferSpiFlashRK::appendDataToSector(Sector *sector, const DataBuff
         return false;
     }
 
-    Record record;
-    record.offset = offset;
-    record.c.flags = flags;
-    record.c.size = data.size();
-    sector->records.push_back(record);
 
     RecordCommon recordCommon;
-    recordCommon = record.c;
+    recordCommon.flags = flags;
+    recordCommon.size = data.size();
+    sector->records.push_back(recordCommon);
+
     spiFlash->writeData(addr + offset, &recordCommon, sizeof(RecordCommon));
 
     spiFlash->writeData(addr + offset + sizeof(RecordCommon), data.getBuffer(), data.size());
@@ -257,14 +252,14 @@ bool CircularBufferSpiFlashRK::readDataFromSector(Sector *sector, size_t index, 
     uint16_t offset = sizeof(SectorHeader);
     for(auto iter = sector->records.begin(); iter != sector->records.end(); iter++, curIndex++) {
         if (index == curIndex) {
-            uint8_t *dataBuf = data.allocate(iter->c.size);
+            uint8_t *dataBuf = data.allocate(iter->size);
             spiFlash->readData(addr + offset + sizeof(RecordCommon), dataBuf, data.size());
 
-            meta = iter->c;
+            meta = *iter;
             bResult = true;
             break;
         }
-        offset += sizeof(RecordCommon) + iter->c.size;
+        offset += sizeof(RecordCommon) + iter->size;
     }
 
     return bResult;
@@ -284,7 +279,7 @@ void CircularBufferSpiFlashRK::Sector::clear(uint16_t sectorNum) {
 uint16_t CircularBufferSpiFlashRK::Sector::getLastOffset() const {
     uint16_t lastOffset = sizeof(SectorHeader);
     for(auto iter = records.begin(); iter != records.end(); iter++) {
-        lastOffset = iter->offset + sizeof(RecordCommon) + iter->c.size;
+        lastOffset += sizeof(RecordCommon) + iter->size;
     }
     return lastOffset;
 }
@@ -302,8 +297,11 @@ void CircularBufferSpiFlashRK::Sector::log(const char *msg, bool includeData) co
 
     _log.trace("logSector %s sectorNum=%d flags=0x%x sequence=%d lastOffset=%d", msg, (int)sectorNum, (int)c.flags, (int)c.sequence, (int)lastOffset); 
 
+
+    uint16_t offset = sizeof(SectorHeader);
     for(auto iter = records.begin(); iter != records.end(); iter++) {
-        _log.trace(" record offset=%d size=%d flags=%x", (int)iter->offset, (int)iter->c.size, (int)iter->c.flags);        
+        _log.trace(" record offset=%d size=%d flags=%x", (int)offset, (int)iter->size, (int)iter->flags);        
+        offset += sizeof(RecordCommon) + iter->size;
     }
 }
 
