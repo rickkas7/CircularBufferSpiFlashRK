@@ -217,7 +217,7 @@ public:
         RecordCommon c;
     };
 
-    struct SectorCommon {
+    struct SectorCommon { // 8 bytes
         uint32_t sequence;
         uint16_t flags;
         uint16_t reserved;
@@ -254,8 +254,32 @@ public:
 
     bool fsck();
 
+    /**
+     * @brief Get the Sector object for a sector if it exists in the cache
+     * 
+     * @param sectorNum 
+     * @return Sector* Object if it exists, or nullptr if not
+     * 
+     * The Sector object is just the metadata and an index of the records in it. It does not
+     * contain a copy of the data, so it's relatively small.
+     * 
+     * Do not delete the object returned by this method; it's owned by the cache and is
+     * not a copy!
+     */
     Sector *getSectorFromCache(uint16_t sectorNum);
 
+    /**
+     * @brief Get the Sector object for a sector, allocating and reading it if not in the cache
+     * 
+     * @param sectorNum 
+     * @return Sector* 
+     * 
+     * The Sector object is just the metadata and an index of the records in it. It does not
+     * contain a copy of the data, so it's relatively small.
+     * 
+     * Do not delete the object returned by this method; it's owned by the cache and is
+     * not a copy!
+     */
     Sector *getSector(uint16_t sectorNum);
 
 
@@ -328,6 +352,7 @@ protected:
     size_t addrEnd;
     size_t sectorCount; //!< Calculated in constructor, number of sectors from addrStart to addrEnd
 
+    SectorCommon *sectorMeta = nullptr;
 
     Sector *currentReadSector = nullptr;
     Sector *currentWriteSector = nullptr;

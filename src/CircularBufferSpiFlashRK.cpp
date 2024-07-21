@@ -18,6 +18,14 @@ CircularBufferSpiFlashRK::CircularBufferSpiFlashRK(SpiFlash *spiFlash, size_t ad
     sectorCount = (addrEnd - addrStart) / spiFlash->getSectorSize();
     _log.trace("addrStart=0x%x addrEnd=0x%x sectorSize=%d sectorCount=%d", (int)addrStart, (int)addrEnd, (int)spiFlash->getSectorSize(), (int)sectorCount);
 
+    // SectorCommon structure is 8 bytes
+    // A 1 MB flash chip has 256 sectors (4096 bytes each), so sectorMeta would be 2048 bytes.
+    // This is a reasonable allocation as it greatly reduces the number of reads during normal operation.
+    sectorMeta = new SectorCommon[sectorCount];
+    if (!sectorMeta) {
+        _log.error("could not allocate sectorMeta sectorCount=%d", (int)sectorCount);
+    }
+
 }
 
 CircularBufferSpiFlashRK::~CircularBufferSpiFlashRK() {
@@ -29,55 +37,25 @@ CircularBufferSpiFlashRK::~CircularBufferSpiFlashRK() {
 }
 
 bool CircularBufferSpiFlashRK::load() {
-    SectorCommon *scanData = new SectorCommon[sectorCount];
-    if (!scanData) {
-        _log.error("could not allocate scanData sectorCount=%d", (int)sectorCount);
+    if (!sectorMeta) {
+        _log.error("sectorMeta not allocated");
         return false;
     }
-
-    firstSector = -1;
-    firstSectorSequence = 0;
-
-    lastSector = -1;
-    lastSectorSequence = 0;
 
     for(int sectorIndex = 0; sectorIndex < sectorCount; sectorIndex++) {
         SectorHeader sectorHeader;
 
         spiFlash->readData(addrStart + sectorIndex * spiFlash->getSectorSize(), &sectorHeader, sizeof(SectorHeader));
         if (sectorHeader.sectorMagic == SECTOR_MAGIC) {
-            scanData[sectorIndex] = sectorHeader.c;
+            sectorMeta[sectorIndex] = sectorHeader.c;
 
             // _log.trace("loading sectorIndex=%d sequence=%d flags=0x%x", sectorIndex, (int)sectorHeader.c.sequence, (int)sectorHeader.c.flags);
-
-            if (firstSector < 0 || sectorHeader.c.sequence < firstSectorSequence) {
-                firstSector = sectorIndex;
-                firstSectorSequence = sectorHeader.c.sequence ;
-            }
-            if (lastSector < 0 || sectorHeader.c.sequence > lastSectorSequence) {
-                lastSector = sectorIndex;
-                lastSectorSequence = sectorHeader.c.flags ;
-            }
+        }
+        else {
+            _log.error("sector %d invalid magic 0x%x", (int)sectorIndex, (int)sectorHeader.sectorMagic);
+            return false;            
         }
     }
-    /*
-    if (firstSector < 0) {
-        _log.trace("flash is empty");
-
-        firstSector = lastSector = 0;
-        firstSectorSequence = lastSectorSequence = 1;
-        writeSectorHeader(firstSector, true, firstSectorSequence);
-    }
-
-    currentReadSector = getSector(firstSector);
-
-    if (firstSector != lastSector) {
-        currentWriteSector = getSector(lastSector);
-    }
-    else {
-        currentWriteSector = currentReadSector;
-    }
-    */
 
     return true;
 }
@@ -150,11 +128,14 @@ CircularBufferSpiFlashRK::Sector *CircularBufferSpiFlashRK::getSector(uint16_t s
 
 
 bool CircularBufferSpiFlashRK::readSector(uint16_t sectorNum, Sector *sector) {
+    sectorNum %= sectorCount;
 
     size_t addr = sectorNumToAddr(sectorNum);
 
     sector->clear(sectorNum);
 
+    sector->c = sectorMeta[sectorNum];
+    /*
     // Read header
     SectorHeader sectorHeader;
     spiFlash->readData(addr, &sectorHeader, sizeof(SectorHeader));
@@ -168,13 +149,10 @@ bool CircularBufferSpiFlashRK::readSector(uint16_t sectorNum, Sector *sector) {
         _log.error("readSector invalid sectorMagic=%08x sectorNum=%d", (int)sectorHeader.sectorMagic, (int)sectorNum);
         return false;
     }
-    
-    static const uint32_t SECTOR_INTERNAL_FLAG_ERASED = 0x0001;
-    static const uint32_t SECTOR_INTERNAL_FLAG_CORRUPTED = 0x0002;
-
 
     sector->c = sectorHeader.c;
-
+    */
+    
     // Read records
     uint16_t offset = sizeof(SectorHeader);
     while((offset + sizeof(RecordHeader)) < spiFlash->getSectorSize()) {
@@ -228,6 +206,7 @@ bool CircularBufferSpiFlashRK::writeSectorHeader(uint16_t sectorNum, bool erase,
         spiFlash->sectorErase(addr);
     }
 
+    // Update SPI flash
     SectorHeader sectorHeader;
     sectorHeader.sectorMagic = SECTOR_MAGIC;
     sectorHeader.c.sequence = sequence;    
@@ -235,6 +214,10 @@ bool CircularBufferSpiFlashRK::writeSectorHeader(uint16_t sectorNum, bool erase,
     sectorHeader.c.reserved = (uint16_t) ~0;
     spiFlash->writeData(addr, &sectorHeader, sizeof(SectorHeader));
 
+    // Update metadata in RAM
+    sectorMeta[sectorNum] = sectorHeader.c;
+
+    // Update cache
     Sector *pSector = getSectorFromCache(sectorNum);
     if (pSector) {
         pSector->c = sectorHeader.c;
