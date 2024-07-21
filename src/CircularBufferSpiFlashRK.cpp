@@ -155,36 +155,30 @@ bool CircularBufferSpiFlashRK::readSector(uint16_t sectorNum, Sector *sector) {
     
     // Read records
     uint16_t offset = sizeof(SectorHeader);
-    while((offset + sizeof(RecordHeader)) < spiFlash->getSectorSize()) {
-        RecordHeader recordHeader;
-        spiFlash->readData(addr + offset, &recordHeader, sizeof(RecordHeader));
+    while((offset + sizeof(RecordCommon)) < spiFlash->getSectorSize()) {
+        RecordCommon recordCommon;
+        spiFlash->readData(addr + offset, &recordCommon, sizeof(RecordCommon));
         
-        if (recordHeader.recordMagic == RECORD_MAGIC_ERASED) { // 0xffffffff
+        if (recordCommon.size == 0xffff) {
             // Erased, no more data
             break;
         }
 
-        if (recordHeader.recordMagic != RECORD_MAGIC) {
+        if (recordCommon.size >= (spiFlash->getSectorSize() - sizeof(RecordCommon) - sizeof(SectorHeader))) {
             sector->internalFlags |= SECTOR_INTERNAL_FLAG_CORRUPTED;
-            _log.error("readSector invalid recordMagic=%08x sectorNum=%d offset=%d", (int)recordHeader.recordMagic, (int)sectorNum, (int)offset);
+            _log.error("readSector invalid size sectorNum=%d offset=%d size=%d", (int)sectorNum, (int)offset, (int)recordCommon.size);
             return false;
         }
 
-        if (recordHeader.c.size >= (spiFlash->getSectorSize() - sizeof(RecordHeader) - sizeof(SectorHeader))) {
-            sector->internalFlags |= SECTOR_INTERNAL_FLAG_CORRUPTED;
-            _log.error("readSector invalid size sectorNum=%d offset=%d size=%d", (int)sectorNum, (int)offset, (int)recordHeader.c.size);
-            return false;
-        }
-
-        uint16_t nextOffset = offset + sizeof(RecordHeader) + recordHeader.c.size;
+        uint16_t nextOffset = offset + sizeof(RecordCommon) + recordCommon.size;
         if (nextOffset > spiFlash->getSectorSize()) {
             sector->internalFlags |= SECTOR_INTERNAL_FLAG_CORRUPTED;
-            _log.error("readSector invalid offset sectorNum=%d offset=%d size=%d", (int)sectorNum, (int)offset, (int)recordHeader.c.size);
+            _log.error("readSector invalid offset sectorNum=%d offset=%d size=%d", (int)sectorNum, (int)offset, (int)recordCommon.size);
             return false;
         }
         Record record;
         record.offset = offset;
-        record.c = recordHeader.c;
+        record.c = recordCommon;
         sector->records.push_back(record);
 
         offset = nextOffset;
@@ -235,7 +229,7 @@ bool CircularBufferSpiFlashRK::appendDataToSector(Sector *sector, const DataBuff
     uint16_t offset = sector->getLastOffset();
 
     uint16_t spaceLeft = spiFlash->getSectorSize() - offset;
-    if ((data.size() + sizeof(RecordHeader)) > spaceLeft) {
+    if ((data.size() + sizeof(RecordCommon)) > spaceLeft) {
         return false;
     }
 
@@ -245,12 +239,11 @@ bool CircularBufferSpiFlashRK::appendDataToSector(Sector *sector, const DataBuff
     record.c.size = data.size();
     sector->records.push_back(record);
 
-    RecordHeader recordHeader;
-    recordHeader.recordMagic = RECORD_MAGIC;
-    recordHeader.c = record.c;
-    spiFlash->writeData(addr + offset, &recordHeader, sizeof(RecordHeader));
+    RecordCommon recordCommon;
+    recordCommon = record.c;
+    spiFlash->writeData(addr + offset, &recordCommon, sizeof(RecordCommon));
 
-    spiFlash->writeData(addr + offset + sizeof(RecordHeader), data.getBuffer(), data.size());
+    spiFlash->writeData(addr + offset + sizeof(RecordCommon), data.getBuffer(), data.size());
 
     return true;
 }
@@ -265,13 +258,13 @@ bool CircularBufferSpiFlashRK::readDataFromSector(Sector *sector, size_t index, 
     for(auto iter = sector->records.begin(); iter != sector->records.end(); iter++, curIndex++) {
         if (index == curIndex) {
             uint8_t *dataBuf = data.allocate(iter->c.size);
-            spiFlash->readData(addr + offset + sizeof(RecordHeader), dataBuf, data.size());
+            spiFlash->readData(addr + offset + sizeof(RecordCommon), dataBuf, data.size());
 
             meta = iter->c;
             bResult = true;
             break;
         }
-        offset += sizeof(RecordHeader) + iter->c.size;
+        offset += sizeof(RecordCommon) + iter->c.size;
     }
 
     return bResult;
@@ -291,7 +284,7 @@ void CircularBufferSpiFlashRK::Sector::clear(uint16_t sectorNum) {
 uint16_t CircularBufferSpiFlashRK::Sector::getLastOffset() const {
     uint16_t lastOffset = sizeof(SectorHeader);
     for(auto iter = records.begin(); iter != records.end(); iter++) {
-        lastOffset = iter->offset + sizeof(RecordHeader) + iter->c.size;
+        lastOffset = iter->offset + sizeof(RecordCommon) + iter->c.size;
     }
     return lastOffset;
 }

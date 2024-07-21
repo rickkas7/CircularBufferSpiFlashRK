@@ -207,11 +207,6 @@ public:
         uint16_t flags;
     };
 
-    struct RecordHeader {
-        uint32_t recordMagic;
-        RecordCommon c;
-    };
-
     struct Record {
         size_t offset; // Offset of the beginning of RecordCommon, not offset of data!
         RecordCommon c;
@@ -311,11 +306,10 @@ public:
     static const uint32_t SECTOR_INTERNAL_FLAG_CORRUPTED = 0x0002;
     static const uint32_t SECTOR_INTERNAL_FLAG_VALID = 0x8000;
 
-    static const uint32_t RECORD_MAGIC = 0x26793787;
-    static const uint32_t RECORD_MAGIC_ERASED = 0xffffffff;
     static const uint16_t RECORD_FLAG_DELETED_MASK = 0x0001;
 
     static const uint32_t UNUSED_MAGIC = 0xa417a966;
+    static const uint32_t UNUSED_MAGIC2 = 0x26793787;
 
     static const size_t SECTOR_CACHE_SIZE = 10;
 
