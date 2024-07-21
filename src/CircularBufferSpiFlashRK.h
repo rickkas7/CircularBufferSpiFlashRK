@@ -237,12 +237,32 @@ public:
     CircularBufferSpiFlashRK(SpiFlash *spiFlash, size_t addrStart, size_t addrEnd);
     virtual ~CircularBufferSpiFlashRK();
 
+    /**
+     * @brief Load the metadata for the file system
+     * 
+     * @return true 
+     * @return false 
+     * 
+     * You must do this (or format) before using the file system. If this function returns
+     * false the format is not valid and you should format it.
+     */
     bool load();
 
-
+    /**
+     * @brief Formats the file system
+     * 
+     * @return true 
+     * @return false 
+     * 
+     * This will erase every sector and write an empty file structure to it. This must
+     * be done if the file system is invalid or erased.
+     */
     bool format();
 
+
+
     bool fsck();
+
 
     /**
      * @brief Get the Sector object for a sector if it exists in the cache
@@ -281,6 +301,28 @@ public:
 
     bool readDataFromSector(Sector *sector, size_t index, DataBuffer &data, RecordCommon &meta);
 
+    class SectorInfo {
+    public:
+        void log(const char *msg) const;
+
+        uint16_t firstSector;
+        uint16_t lastSector;
+        uint16_t writeSector;
+    };
+    bool getSectorInfo(SectorInfo &sectorInfo) const;
+
+
+    class DataInfo : public DataBuffer {
+    public:        
+        uint16_t sectorNum;
+        SectorCommon sectorCommon;
+        size_t index;
+        RecordCommon recordCommon;
+    };
+
+    bool readData(DataInfo &dataInfo);
+
+    bool markAsRead(const DataInfo &dataInfo);
 
     /**
      * @brief Convert a sector number to an address
@@ -295,13 +337,13 @@ public:
     static const uint32_t SECTOR_MAGIC_ERASED = 0xffffffff;
     static const uint32_t SECTOR_FLAG_IN_USE_MASK = 0x0001;
     static const uint32_t SECTOR_FLAG_FINALIZED_MASK = 0x0002;
-    static const uint32_t SECTOR_FLAG_DELETED_MASK = 0x0004;
+    static const uint32_t SECTOR_FLAG_DELETED_MASK = 0x0004; // Not using this, probably (actually erasing instead)
 
     static const uint32_t SECTOR_INTERNAL_FLAG_ERASED = 0x0001;
     static const uint32_t SECTOR_INTERNAL_FLAG_CORRUPTED = 0x0002;
     static const uint32_t SECTOR_INTERNAL_FLAG_VALID = 0x8000;
 
-    static const uint16_t RECORD_FLAG_DELETED_MASK = 0x0001;
+    static const uint16_t RECORD_FLAG_READ_MASK = 0x0001;
 
     static const uint32_t UNUSED_MAGIC = 0xa417a966;
     static const uint32_t UNUSED_MAGIC2 = 0x26793787;
@@ -351,6 +393,7 @@ protected:
     int lastSector = -1;
     uint32_t lastSectorSequence = 0;
 
+    bool isValid = false;
     std::deque<Sector*> sectorCache;
 
     /**
