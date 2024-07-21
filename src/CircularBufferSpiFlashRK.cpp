@@ -222,7 +222,7 @@ bool CircularBufferSpiFlashRK::writeSectorHeader(uint16_t sectorNum, bool erase,
 
     size_t addr = sectorNumToAddr(sectorNum);
 
-    _log.trace("writeSectorHeader sectorNum=%d addr=0x%x sequence=%d", (int)sectorNum, (int)addr, (int)sequence);
+    // _log.trace("writeSectorHeader sectorNum=%d addr=0x%x sequence=%d", (int)sectorNum, (int)addr, (int)sequence);
 
     if (erase) {
         spiFlash->sectorErase(addr);
@@ -273,6 +273,7 @@ bool CircularBufferSpiFlashRK::appendDataToSector(Sector *sector, const DataBuff
 }
 
 bool CircularBufferSpiFlashRK::readDataFromSector(Sector *sector, size_t index, DataBuffer &data, RecordCommon &meta) {
+    bool bResult = false;
     size_t addr = sectorNumToAddr(sector->sectorNum);
 
     size_t curIndex = 0;
@@ -284,12 +285,13 @@ bool CircularBufferSpiFlashRK::readDataFromSector(Sector *sector, size_t index, 
             spiFlash->readData(addr + offset + sizeof(RecordHeader), dataBuf, data.size());
 
             meta = iter->c;
+            bResult = true;
             break;
         }
         offset += sizeof(RecordHeader) + iter->c.size;
     }
 
-    return (curIndex == index);
+    return bResult;
 }
 
 
