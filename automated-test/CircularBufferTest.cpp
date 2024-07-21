@@ -70,8 +70,7 @@ void testUnitSectorAppend() {
     // Unit testing of sector append functions
     {
         CircularBufferSpiFlashRK circBuffer(&spiFlash, 0, 1024 * 1024);
-        circBuffer.erase();
-        circBuffer.load();
+        circBuffer.format();
 
         CircularBufferSpiFlashRK::Sector *pSector = circBuffer.getSector(0);
 
@@ -94,9 +93,6 @@ void testUnitSectorAppend() {
 
         pSector->log(String(__LINE__));
 
-        saveSectorToFile(pSector, "test01-1");
-
-        delete pSector;        
     }
 
 

@@ -17,7 +17,7 @@ void SpiFlash::writeData(size_t addr, const void *buf, size_t bufLen) {
     assert((addr + bufLen) < size);
 
     for(size_t ii = 0; ii < bufLen; ii++) {
-        uint8_t value = ((uint8_t *)buf)[addr + ii];
+        uint8_t value = ((uint8_t *)buf)[ii];
 
         buffer[addr + ii] &= value;
     }

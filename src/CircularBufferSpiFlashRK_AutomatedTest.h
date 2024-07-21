@@ -9,8 +9,9 @@ void test01(SpiFlash *spiFlash) {
     const size_t startAddr = 0;
     const size_t testSize = 1 * 1024 * 1024;
     
-    CircularBufferSpiFlashRK circBuf(spiFlash, startAddr, testSize);
-    circBuf.erase();
+    for(size_t addr = startAddr; addr < startAddr + testSize; addr += 4096) {
+        spiFlash->sectorErase(addr);
+    }
 
     // Check erase
     uint8_t tempBuf[256];
@@ -59,8 +60,6 @@ void test01(SpiFlash *spiFlash) {
     }
 
     spiFlash->sectorErase(startAddr);
-
-    circBuf.load();
 
 
     Log.info("test01 completed!");

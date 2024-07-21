@@ -249,7 +249,12 @@ public:
 
     bool load();
 
-    bool erase();
+
+    bool format();
+
+    bool fsck();
+
+    Sector *getSectorFromCache(uint16_t sectorNum);
 
     Sector *getSector(uint16_t sectorNum);
 
@@ -274,7 +279,7 @@ public:
 
     static const uint32_t SECTOR_MAGIC = 0x0ceb6443;
     static const uint32_t SECTOR_MAGIC_ERASED = 0xffffffff;
-    static const uint32_t SECTOR_FLAG_HEADER_MASK = 0x0001;
+    static const uint32_t SECTOR_FLAG_IN_USE_MASK = 0x0001;
     static const uint32_t SECTOR_FLAG_FINALIZED_MASK = 0x0002;
     static const uint32_t SECTOR_FLAG_DELETED_MASK = 0x0004;
 

@@ -16,6 +16,7 @@ CircularBufferSpiFlashRK::CircularBufferSpiFlashRK(SpiFlash *spiFlash, size_t ad
         _log.error("addrEnd is not sector aligned addr=%d sectorSize=%d", (int)addrEnd, (int)spiFlash->getSectorSize());
     }
     sectorCount = (addrEnd - addrStart) / spiFlash->getSectorSize();
+    _log.trace("addrStart=0x%x addrEnd=0x%x sectorSize=%d sectorCount=%d", (int)addrStart, (int)addrEnd, (int)spiFlash->getSectorSize(), (int)sectorCount);
 
 }
 
@@ -47,7 +48,7 @@ bool CircularBufferSpiFlashRK::load() {
         if (sectorHeader.sectorMagic == SECTOR_MAGIC) {
             scanData[sectorIndex] = sectorHeader.c;
 
-            _log.trace("loading sectorIndex=%d sequence=%d flags=0x%x", sectorIndex, (int)sectorHeader.c.sequence, (int)sectorHeader.c.flags);
+            // _log.trace("loading sectorIndex=%d sequence=%d flags=0x%x", sectorIndex, (int)sectorHeader.c.sequence, (int)sectorHeader.c.flags);
 
             if (firstSector < 0 || sectorHeader.c.sequence < firstSectorSequence) {
                 firstSector = sectorIndex;
@@ -59,6 +60,7 @@ bool CircularBufferSpiFlashRK::load() {
             }
         }
     }
+    /*
     if (firstSector < 0) {
         _log.trace("flash is empty");
 
@@ -75,19 +77,29 @@ bool CircularBufferSpiFlashRK::load() {
     else {
         currentWriteSector = currentReadSector;
     }
+    */
 
     return true;
 }
 
-bool CircularBufferSpiFlashRK::erase() {
 
-    for(size_t addr = addrStart; addr < addrEnd; addr += spiFlash->getSectorSize()) {
-        spiFlash->sectorErase(addr);
+bool CircularBufferSpiFlashRK::format() {
+    uint32_t sequence = 1;
+
+    for(uint16_t sectorNum = 0; sectorNum < sectorCount; sectorNum++) {
+        writeSectorHeader(sectorNum, true /* erase */, sequence++);
     }
+
+    return load();
+}
+
+bool CircularBufferSpiFlashRK::fsck() {
+
     return true;
 }
 
-CircularBufferSpiFlashRK::Sector *CircularBufferSpiFlashRK::getSector(uint16_t sectorNum) {
+
+CircularBufferSpiFlashRK::Sector *CircularBufferSpiFlashRK::getSectorFromCache(uint16_t sectorNum) {
     CircularBufferSpiFlashRK::Sector *pSector = nullptr;
     sectorNum %= sectorCount;
 
@@ -107,6 +119,14 @@ CircularBufferSpiFlashRK::Sector *CircularBufferSpiFlashRK::getSector(uint16_t s
             }
         }
     }
+    return pSector;
+}
+
+
+CircularBufferSpiFlashRK::Sector *CircularBufferSpiFlashRK::getSector(uint16_t sectorNum) {
+    sectorNum %= sectorCount;
+
+    CircularBufferSpiFlashRK::Sector *pSector = getSectorFromCache(sectorNum);
 
     if (!pSector) {
         // Not found in cache
@@ -145,7 +165,7 @@ bool CircularBufferSpiFlashRK::readSector(uint16_t sectorNum, Sector *sector) {
 
     if (sectorHeader.sectorMagic != SECTOR_MAGIC) {
         sector->internalFlags |= SECTOR_INTERNAL_FLAG_CORRUPTED;
-        _log.error("readSector invalid sectorMagic sectorNum=%d", (int)sectorNum);
+        _log.error("readSector invalid sectorMagic=%08x sectorNum=%d", (int)sectorHeader.sectorMagic, (int)sectorNum);
         return false;
     }
     
@@ -202,6 +222,8 @@ bool CircularBufferSpiFlashRK::writeSectorHeader(uint16_t sectorNum, bool erase,
 
     size_t addr = sectorNumToAddr(sectorNum);
 
+    _log.trace("writeSectorHeader sectorNum=%d addr=0x%x sequence=%d", (int)sectorNum, (int)addr, (int)sequence);
+
     if (erase) {
         spiFlash->sectorErase(addr);
     }
@@ -209,12 +231,19 @@ bool CircularBufferSpiFlashRK::writeSectorHeader(uint16_t sectorNum, bool erase,
     SectorHeader sectorHeader;
     sectorHeader.sectorMagic = SECTOR_MAGIC;
     sectorHeader.c.sequence = sequence;    
-    sectorHeader.c.flags = (uint16_t) ~SECTOR_FLAG_HEADER_MASK; // 0xfffe
+    sectorHeader.c.flags = (uint16_t) ~0;
     sectorHeader.c.reserved = (uint16_t) ~0;
     spiFlash->writeData(addr, &sectorHeader, sizeof(SectorHeader));
 
+    Sector *pSector = getSectorFromCache(sectorNum);
+    if (pSector) {
+        pSector->c = sectorHeader.c;
+    }
+
     return true;
 }
+
+
 
 bool CircularBufferSpiFlashRK::appendDataToSector(Sector *sector, const DataBuffer &data, uint16_t flags) {
 
@@ -338,7 +367,7 @@ void CircularBufferSpiFlashRK::DataBuffer::free() {
         delete[] this->buf;
         this->buf = nullptr;
     }
-    len = 0 ;
+    len = 0;
 }
 
 void CircularBufferSpiFlashRK::DataBuffer::copy(const void *buf, size_t len) {
