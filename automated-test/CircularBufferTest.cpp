@@ -161,7 +161,7 @@ void testDataBuffer() {
     }
 }
 
-void testUnitSectorAppend() {
+void testUnitSectorAppend(std::vector<String> &testSet) {
     // Unit testing of sector append functions
     {
         const uint16_t sectorCount = 512;
@@ -171,13 +171,13 @@ void testUnitSectorAppend() {
 
         int stringNum = 0;
 
-        for(uint16_t sectorNum = 0; sectorNum < sectorCount && stringNum < randomStringSmall.size(); sectorNum++) {
+        for(uint16_t sectorNum = 0; sectorNum < sectorCount && stringNum < testSet.size(); sectorNum++) {
             CircularBufferSpiFlashRK::Sector *pSector = circBuffer.getSector(sectorNum);
 
-            while(stringNum < randomStringSmall.size()) {
+            while(stringNum < testSet.size()) {
                 bool bResult;
 
-                CircularBufferSpiFlashRK::DataBuffer origBuffer(randomStringSmall.at(stringNum).c_str());
+                CircularBufferSpiFlashRK::DataBuffer origBuffer(testSet.at(stringNum).c_str());
                 bResult = circBuffer.appendDataToSector(pSector, origBuffer, 0xffff);
                 if (!bResult) {
                     break;
@@ -191,11 +191,11 @@ void testUnitSectorAppend() {
         stringNum = 0;
         bool error = false;
 
-        for(uint16_t sectorNum = 0; sectorNum < sectorCount && stringNum < randomStringSmall.size() && !error; sectorNum++) {
+        for(uint16_t sectorNum = 0; sectorNum < sectorCount && stringNum < testSet.size() && !error; sectorNum++) {
             CircularBufferSpiFlashRK::Sector *pSector = circBuffer.getSector(sectorNum);
 
             int stringIndex = 0;
-            while(stringNum < randomStringSmall.size()) {
+            while(stringNum < testSet.size()) {
                 CircularBufferSpiFlashRK::DataBuffer tempBuffer;
                 CircularBufferSpiFlashRK::RecordCommon meta;
 
@@ -204,14 +204,14 @@ void testUnitSectorAppend() {
                     break;
                 }
 
-                if (strcmp(tempBuffer.c_str(), randomStringSmall.at(stringNum).c_str()) == 0) {
+                if (strcmp(tempBuffer.c_str(), testSet.at(stringNum).c_str()) == 0) {
 
                 }
                 else {
                     Log.error("mismatch line=%d stringIndex=%d stringNum=%d sectorNum=%d", __LINE__, stringIndex, (int)stringNum, (int)sectorNum );
-                    printf("got: %s\nexp: %s\n", tempBuffer.c_str(), randomStringSmall.at(stringNum).c_str());
+                    printf("got: %s\nexp: %s\n", tempBuffer.c_str(), testSet.at(stringNum).c_str());
 
-                    for(int tempStringIndex = 0; tempStringIndex < randomStringSmall.size(); tempStringIndex++) {
+                    for(int tempStringIndex = 0; tempStringIndex < testSet.size(); tempStringIndex++) {
                         if (randomStringSmall.at(tempStringIndex) == tempBuffer.c_str()) {
                             printf("found match at stringIndex=%d\n", tempStringIndex);
                             break;
@@ -226,27 +226,6 @@ void testUnitSectorAppend() {
                 stringIndex++;
             }
         }
-        
-
-        /*
-        pSector->log(String(__LINE__));
-
-        CircularBufferSpiFlashRK::DataBuffer origBuffer("testing!");
-
-        bResult = circBuffer.appendDataToSector(pSector, origBuffer, 0xffff);
-        assert(bResult);
-
-        CircularBufferSpiFlashRK::DataBuffer tempBuffer;
-        CircularBufferSpiFlashRK::RecordCommon meta;
-
-        bResult = circBuffer.readDataFromSector(pSector, 0, tempBuffer, meta);
-        assert(bResult);
-        assert(origBuffer == tempBuffer);
-
-        pSector->log(String(__LINE__));
-        */
-
-
     }
 
 
@@ -261,7 +240,8 @@ void runUnitTests() {
 
     testDataBuffer();
     
-    testUnitSectorAppend();
+    testUnitSectorAppend(randomStringSmall);
+    testUnitSectorAppend(randomString1024);
 
 }
 
