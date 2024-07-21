@@ -14,47 +14,6 @@
 
 class CircularBufferSpiFlashRK {
 public:
-    struct RecordCommon {
-        uint16_t size;
-        uint16_t flags;
-    };
-
-    struct RecordHeader {
-        uint32_t recordMagic;
-        RecordCommon c;
-    };
-
-    struct Record {
-        size_t offset;
-        RecordCommon c;
-    };
-
-    struct SectorCommon {
-        uint32_t sequence;
-        uint16_t flags;
-        uint16_t reserved;
-    };
-
-    struct SectorHeader {
-        uint32_t sectorMagic;
-        SectorCommon c;
-    };
-
-    class Sector {
-    public:
-        void clear(uint16_t sectorNum = 0);
-
-        uint16_t getLastOffset() const;
-
-        void log(const char *msg, bool includeData = false) const;
-
-
-        uint16_t sectorNum = 0;
-        uint16_t internalFlags = 0;
-        std::vector<Record> records;
-        SectorCommon c;
-    };
-
     /**
      * @brief Class to hold a copy of data, either by pointer and length or a c-string
      * 
@@ -142,6 +101,14 @@ public:
          * The internal buffer includes the null terminator so c_str() is efficient.
          */
         void copy(const char *str);
+
+        /**
+         * @brief Allocate a buffer of the specified length but do not write the data
+         * 
+         * @param len 
+         * @return uint8_t 
+         */
+        uint8_t *allocate(size_t len);
         
         /**
          * @brief Returns true if size and bytes are the same as another object
@@ -204,7 +171,14 @@ public:
          * @param index 0 = first byte of buffer
          * @return uint8_t Return 0 if buffer or index is invalid
          */
-        uint8_t get(size_t index) const;
+        uint8_t getByIndex(size_t index) const;
+
+        /**
+         * @brief Returns a pointer to the internal buffer
+         * 
+         * @return const uint8_t* Pointer to buffer, or nullptr
+         */
+        const uint8_t *getBuffer() const { return buf; };
 
 
     protected:
@@ -228,6 +202,46 @@ public:
          */
         size_t len;
     };
+    struct RecordCommon {
+        uint16_t size;
+        uint16_t flags;
+    };
+
+    struct RecordHeader {
+        uint32_t recordMagic;
+        RecordCommon c;
+    };
+
+    struct Record {
+        size_t offset; // Offset of the beginning of RecordCommon, not offset of data!
+        RecordCommon c;
+    };
+
+    struct SectorCommon {
+        uint32_t sequence;
+        uint16_t flags;
+        uint16_t reserved;
+    };
+
+    struct SectorHeader {
+        uint32_t sectorMagic;
+        SectorCommon c;
+    };
+
+    class Sector {
+    public:
+        void clear(uint16_t sectorNum = 0);
+
+        uint16_t getLastOffset() const;
+
+        void log(const char *msg, bool includeData = false) const;
+
+        uint16_t sectorNum = 0;
+        uint16_t internalFlags = 0;
+        std::vector<Record> records;
+        SectorCommon c;
+    };
+
 
 
     CircularBufferSpiFlashRK(SpiFlash *spiFlash, size_t addrStart, size_t addrEnd);
@@ -244,7 +258,9 @@ public:
 
     bool writeSectorHeader(uint16_t sectorNum, bool erase, uint32_t sequence);
 
-    bool appendToSector(Sector *sector, const void *data, size_t dataLen, uint16_t flags, bool write);
+    bool appendDataToSector(Sector *sector, const DataBuffer &data, uint16_t flags);
+
+    bool readDataFromSector(Sector *sector, size_t index, DataBuffer &data, RecordCommon &meta);
 
 
     /**
