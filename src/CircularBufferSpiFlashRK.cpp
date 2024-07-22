@@ -169,12 +169,10 @@ bool CircularBufferSpiFlashRK::readSector(uint16_t sectorNum, Sector *sector) {
     SectorHeader sectorHeader;
     spiFlash->readData(addr, &sectorHeader, sizeof(SectorHeader));
     if (sectorHeader.sectorMagic == SECTOR_MAGIC_ERASED) { // 0xffffffff
-        sector->internalFlags |= SECTOR_INTERNAL_FLAG_ERASED;
         return false;
     }
 
     if (sectorHeader.sectorMagic != SECTOR_MAGIC) {
-        sector->internalFlags |= SECTOR_INTERNAL_FLAG_CORRUPTED;
         _log.error("readSector invalid sectorMagic=%08x sectorNum=%d", (int)sectorHeader.sectorMagic, (int)sectorNum);
         return false;
     }
@@ -193,29 +191,30 @@ bool CircularBufferSpiFlashRK::readSector(uint16_t sectorNum, Sector *sector) {
             break;
         }
 
-        // TODO: Set the sector corrupted flags if corrupted
-        // sectorMeta[sectorNum].flags &= ~SECTOR_FLAG_CORRUPTED_MASK;
+        const char *corruptedError = nullptr;
 
 
         if (recordCommon.size >= (spiFlash->getSectorSize() - sizeof(RecordCommon) - sizeof(SectorHeader))) {
-            sector->internalFlags |= SECTOR_INTERNAL_FLAG_CORRUPTED;
-            _log.error("readSector invalid size sectorNum=%d offset=%d size=%d", (int)sectorNum, (int)offset, (int)recordCommon.size);
-            return false;
+            corruptedError = "invalid size";
         }
 
         uint16_t nextOffset = offset + sizeof(RecordCommon) + recordCommon.size;
         if (nextOffset > spiFlash->getSectorSize()) {
-            sector->internalFlags |= SECTOR_INTERNAL_FLAG_CORRUPTED;
-            _log.error("readSector invalid offset sectorNum=%d offset=%d size=%d", (int)sectorNum, (int)offset, (int)recordCommon.size);
+            corruptedError = "invalid offset";
+        }
+
+        if (corruptedError) {
+            sectorMeta[sectorNum].flags &= ~SECTOR_FLAG_CORRUPTED_MASK;
+            sector->c = sectorMeta[sectorNum];
+            _log.error("readSector corrupted %s sectorNum=%d offset=%d size=%d", corruptedError, (int)sectorNum, (int)offset, (int)recordCommon.size);
             return false;
         }
+
         sector->records.push_back(recordCommon);
 
         offset = nextOffset;
     }
     
-    sector->internalFlags |= SECTOR_INTERNAL_FLAG_VALID;
-
     return true;
 }
 
@@ -539,7 +538,6 @@ void CircularBufferSpiFlashRK::UsageStats::log(LogLevel level, const char *msg) 
 
 void CircularBufferSpiFlashRK::Sector::clear(uint16_t sectorNum) {
     this->sectorNum = sectorNum;
-    this->internalFlags = 0;
     this->records.clear();
     memset(&this->c, 0, sizeof(SectorCommon));
 }

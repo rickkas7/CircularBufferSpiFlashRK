@@ -230,7 +230,6 @@ public:
         void log(LogLevel level, const char *msg, bool includeData = false) const;
 
         uint16_t sectorNum = 0;
-        uint16_t internalFlags = 0;
         std::vector<RecordCommon> records;
         SectorCommon c;
     };
@@ -406,10 +405,6 @@ protected:
     static const uint32_t SECTOR_MAGIC_ERASED = 0xffffffff;
     static const uint32_t SECTOR_FLAG_FINALIZED_MASK = 0x01;
     static const uint32_t SECTOR_FLAG_CORRUPTED_MASK = 0x02;
-
-    static const uint32_t SECTOR_INTERNAL_FLAG_ERASED = 0x0001;
-    static const uint32_t SECTOR_INTERNAL_FLAG_CORRUPTED = 0x0002;
-    static const uint32_t SECTOR_INTERNAL_FLAG_VALID = 0x8000;
 
     static const uint16_t RECORD_FLAG_READ_MASK = 0x0001;
 
