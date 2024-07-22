@@ -202,15 +202,18 @@ public:
          */
         size_t len;
     };
-    struct RecordCommon {
+
+    struct RecordCommon { // 8 bytes
         uint16_t size;
         uint16_t flags;
     };
 
     struct SectorCommon { // 8 bytes
-        uint32_t sequence;
-        uint16_t flags;
-        uint16_t reserved;
+        uint32_t sequence; //!< Monotonically increasing sequence number for sector used
+        unsigned int flags:4; //!< Various flag bits
+        unsigned int reserved:7; //!< Reserved for future use
+        unsigned int recordCount:9; //!< Number of records, set during finalize
+        unsigned int dataSize:12; //!< Number of bytes of data in records, set during finalize
     };
 
     struct SectorHeader {
@@ -226,10 +229,14 @@ public:
 
         void log(const char *msg, bool includeData = false) const;
 
+        void lock() { lockCount++; };
+        void unlock() { lockCount--; };
+
         uint16_t sectorNum = 0;
         uint16_t internalFlags = 0;
         std::vector<RecordCommon> records;
         SectorCommon c;
+        int lockCount = 0;
     };
 
 
@@ -298,6 +305,8 @@ public:
     bool writeSectorHeader(uint16_t sectorNum, bool erase, uint32_t sequence);
 
     bool appendDataToSector(Sector *sector, const DataBuffer &data, uint16_t flags);
+
+    bool finalizeSector(Sector *sector);
 
     bool readDataFromSector(Sector *sector, size_t index, DataBuffer &data, RecordCommon &meta);
 
@@ -385,6 +394,7 @@ protected:
 
     SectorCommon *sectorMeta = nullptr;
 
+    /*
     Sector *currentReadSector = nullptr;
     Sector *currentWriteSector = nullptr;
     int firstSector = -1;
@@ -392,9 +402,12 @@ protected:
 
     int lastSector = -1;
     uint32_t lastSectorSequence = 0;
+    */
 
     bool isValid = false;
     std::deque<Sector*> sectorCache;
+
+    uint32_t lastSequence = 0;
 
     /**
      * @brief Mutex to protect shared resources

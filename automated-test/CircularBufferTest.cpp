@@ -185,6 +185,9 @@ void testUnitSectorAppend(std::vector<String> &testSet) {
 
                 stringNum++;
             }
+
+            circBuffer.finalizeSector(pSector);
+            // pSector->log("test");
         }
 
         
