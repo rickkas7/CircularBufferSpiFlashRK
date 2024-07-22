@@ -236,7 +236,7 @@ void testUnitSectorAppend(std::vector<String> &testSet) {
 }
 
 void testUnitReadWrite(std::vector<String> &testSet) {
-    size_t testCount = 10;
+    size_t testCount = 10000;
 
     const uint16_t sectorCount = 512;
 

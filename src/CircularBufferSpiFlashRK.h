@@ -266,13 +266,17 @@ public:
 
     bool fsck();
 
-
+    /**
+     * @brief Structure used by readData and markAsRead
+     * 
+     * This class is derived from DataBuffer so it its methods can be used to access the data from readData
+     */
     class DataInfo : public DataBuffer {
     public:        
-        uint16_t sectorNum;
-        SectorCommon sectorCommon;
-        size_t index;
-        RecordCommon recordCommon;
+        uint16_t sectorNum; //!< sector number that was read from
+        SectorCommon sectorCommon; //!< Information about the sector. The sequence is what's used from this currently.
+        size_t index; //!< The record index that was read
+        RecordCommon recordCommon; //!< Information about the record that was read
     };
 
     /**
@@ -281,6 +285,9 @@ public:
      * @param dataInfo 
      * @return true 
      * @return false 
+     * 
+     * After reading the data, you must pass the same dataInfo to markAsRead
+     * otherwise you'll read the same data again.
      */
     bool readData(DataInfo &dataInfo);
 
@@ -290,16 +297,37 @@ public:
      * @param dataInfo 
      * @return true 
      * @return false 
+     * 
+     * This method works properly even if the sector was overwritten because the 
+     * buffer was full and additional data was written to it. It will ignore the
+     * mark as read in this case, because the data no longer exists.
      */
     bool markAsRead(const DataInfo &dataInfo);
 
+    /**
+     * @brief Write data to the circular buffer
+     * 
+     * @param data 
+     * @return true 
+     * @return false
+     * 
+     * Data is always written to the buffer. If the circular buffer is full, the oldest
+     * sector is deleted to make room for new data.
+     * 
+     * If there is a read in progress on the oldest sector, it will continue, however
+     * a markAsRead will be ignored since the underlying data will already have been
+     * deleted. 
+     */
     bool writeData(const DataBuffer &data);
 
-
+    /**
+     * @brief Class for various stats about the circular buffer usage
+     */
     class UsageStats {
     public:
         void log(LogLevel level, const char *msg) const;
 
+        
     };
 
     /**
@@ -376,9 +404,8 @@ protected:
 
     static const uint32_t SECTOR_MAGIC = 0x0ceb6443;
     static const uint32_t SECTOR_MAGIC_ERASED = 0xffffffff;
-    static const uint32_t SECTOR_FLAG_IN_USE_MASK = 0x0001; // not currently used, will delete
-    static const uint32_t SECTOR_FLAG_FINALIZED_MASK = 0x0002;
-    static const uint32_t SECTOR_FLAG_CORRUPTED_MASK = 0x0004;
+    static const uint32_t SECTOR_FLAG_FINALIZED_MASK = 0x01;
+    static const uint32_t SECTOR_FLAG_CORRUPTED_MASK = 0x02;
 
     static const uint32_t SECTOR_INTERNAL_FLAG_ERASED = 0x0001;
     static const uint32_t SECTOR_INTERNAL_FLAG_CORRUPTED = 0x0002;
