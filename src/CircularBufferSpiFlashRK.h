@@ -227,7 +227,7 @@ public:
 
         uint16_t getLastOffset() const;
 
-        void log(const char *msg, bool includeData = false) const;
+        void log(LogLevel level, const char *msg, bool includeData = false) const;
 
         uint16_t sectorNum = 0;
         uint16_t internalFlags = 0;
@@ -296,6 +296,23 @@ public:
     bool writeData(const DataBuffer &data);
 
 
+    class UsageStats {
+    public:
+        void log(LogLevel level, const char *msg) const;
+    };
+
+    /**
+     * @brief Get the usage statistics
+     * 
+     * @param usageStats 
+     * @return true 
+     * @return false 
+     * 
+     * This method isn't const because it needs to obtain a lock on this object.
+     */
+    bool getUsageStats(UsageStats &usageStats);
+
+
 #ifndef UNITTEST
 protected:
 #endif
@@ -340,14 +357,13 @@ protected:
 
     class SectorInfo {
     public:
-        void log(const char *msg) const;
+        void log(LogLevel level, const char *msg) const;
 
         uint16_t firstSector;
         uint16_t lastSector;
         uint16_t writeSector;
     };
     bool getSectorInfo(SectorInfo &sectorInfo) const;
-
 
     /**
      * @brief Convert a sector number to an address
@@ -357,12 +373,11 @@ protected:
      */
     uint32_t sectorNumToAddr(uint16_t sectorNum) const { return addrStart + sectorNum * spiFlash->getSectorSize(); };
 
-public:
     static const uint32_t SECTOR_MAGIC = 0x0ceb6443;
     static const uint32_t SECTOR_MAGIC_ERASED = 0xffffffff;
-    static const uint32_t SECTOR_FLAG_IN_USE_MASK = 0x0001;
+    static const uint32_t SECTOR_FLAG_IN_USE_MASK = 0x0001; // not currently used, will delete
     static const uint32_t SECTOR_FLAG_FINALIZED_MASK = 0x0002;
-    static const uint32_t SECTOR_FLAG_DELETED_MASK = 0x0004; // Not using this, probably (actually erasing instead)
+    static const uint32_t SECTOR_FLAG_CORRUPTED_MASK = 0x0004;
 
     static const uint32_t SECTOR_INTERNAL_FLAG_ERASED = 0x0001;
     static const uint32_t SECTOR_INTERNAL_FLAG_CORRUPTED = 0x0002;
@@ -375,6 +390,7 @@ public:
 
     static const size_t SECTOR_CACHE_SIZE = 10;
 
+public:
 #ifndef UNITTEST
     /**
      * @brief Locks the mutex that protects shared resources

@@ -37,6 +37,8 @@ CircularBufferSpiFlashRK::~CircularBufferSpiFlashRK() {
 }
 
 bool CircularBufferSpiFlashRK::load() {
+    bool bResult = true;
+
     WITH_LOCK(*this) {
         isValid = false;
 
@@ -49,8 +51,9 @@ bool CircularBufferSpiFlashRK::load() {
             SectorHeader sectorHeader;
 
             spiFlash->readData(addrStart + sectorIndex * spiFlash->getSectorSize(), &sectorHeader, sizeof(SectorHeader));
+            sectorMeta[sectorIndex] = sectorHeader.c;
+
             if (sectorHeader.sectorMagic == SECTOR_MAGIC) {
-                sectorMeta[sectorIndex] = sectorHeader.c;
 
                 if (sectorHeader.c.sequence > lastSequence) {
                     lastSequence = sectorHeader.c.sequence;
@@ -60,18 +63,22 @@ bool CircularBufferSpiFlashRK::load() {
             }
             else {
                 _log.error("sector %d invalid magic 0x%x", (int)sectorIndex, (int)sectorHeader.sectorMagic);
-                return false;            
+                sectorMeta[sectorIndex].flags &= ~SECTOR_FLAG_CORRUPTED_MASK;
+
+                bResult = false;            
             }
         }
 
         isValid = true;
 
+        // TODO: Check that sequence numbers are reasonable
+
         SectorInfo sectorInfo;
         getSectorInfo(sectorInfo);
-        sectorInfo.log("load");
+        sectorInfo.log(LOG_LEVEL_TRACE, "load");
     }
 
-    return true;
+    return bResult;
 }
 
 
@@ -185,6 +192,10 @@ bool CircularBufferSpiFlashRK::readSector(uint16_t sectorNum, Sector *sector) {
             // Erased, no more data
             break;
         }
+
+        // TODO: Set the sector corrupted flags if corrupted
+        // sectorMeta[sectorNum].flags &= ~SECTOR_FLAG_CORRUPTED_MASK;
+
 
         if (recordCommon.size >= (spiFlash->getSectorSize() - sizeof(RecordCommon) - sizeof(SectorHeader))) {
             sector->internalFlags |= SECTOR_INTERNAL_FLAG_CORRUPTED;
@@ -334,6 +345,11 @@ bool CircularBufferSpiFlashRK::getSectorInfo(SectorInfo &sectorInfo) const {
     sectorInfo.firstSector = sectorInfo.lastSector = 0;
 
     for(uint16_t sectorNum = 0; sectorNum < sectorCount; sectorNum++) {
+        if ((sectorMeta[sectorNum].flags & SECTOR_FLAG_CORRUPTED_MASK) == 0) {
+            // This sector is corrupted, ignore
+            continue;
+        }
+
         if (sectorMeta[sectorNum].sequence < sectorMeta[sectorInfo.firstSector].sequence) {
             sectorInfo.firstSector = sectorNum;
         }
@@ -361,103 +377,164 @@ bool CircularBufferSpiFlashRK::getSectorInfo(SectorInfo &sectorInfo) const {
     return true;
 }
 
-void CircularBufferSpiFlashRK::SectorInfo::log(const char *msg) const {
+void CircularBufferSpiFlashRK::SectorInfo::log(LogLevel level, const char *msg) const {
 
-    _log.trace("%s firstSector=%d lastSector=%d writeSector=%d", msg, (int)firstSector, (int)lastSector, (int)writeSector);
+    _log.log(level, "%s firstSector=%d lastSector=%d writeSector=%d", msg, (int)firstSector, (int)lastSector, (int)writeSector);
 
 }
 
 bool CircularBufferSpiFlashRK::readData(DataInfo &dataInfo) {
+    bool bResult = false;
+
     if (!isValid) {
         _log.error("%s not isValid", "readData");
         return false;
     }
 
-    SectorInfo sectorInfo;
-    if (!getSectorInfo(sectorInfo)) {
-        return false;
-    }
+    WITH_LOCK(*this) {
 
-    dataInfo.sectorNum = sectorInfo.firstSector;
-
-    Sector *pSector = getSector(dataInfo.sectorNum);
-    if (!pSector) {
-        return false;
-    }
-
-    dataInfo.sectorCommon = pSector->c;
-
-    size_t addr = sectorNumToAddr(dataInfo.sectorNum);
-
-    bool bResult = false;
-    dataInfo.index = 0;
-
-    uint16_t offset = sizeof(SectorHeader);
-    for(auto iter = pSector->records.begin(); iter != pSector->records.end(); iter++, dataInfo.index++) {
-        if ((iter->flags & RECORD_FLAG_READ_MASK) == RECORD_FLAG_READ_MASK) {
-            // Not marked as read
-            uint8_t *dataBuf = dataInfo.allocate(iter->size);
-            spiFlash->readData(addr + offset + sizeof(RecordCommon), dataBuf, dataInfo.size());
-
-            dataInfo.recordCommon = *iter;
-            bResult = true;
-            break;
+        SectorInfo sectorInfo;
+        if (!getSectorInfo(sectorInfo)) {
+            return false;
         }
-        offset += sizeof(RecordCommon) + iter->size;
-    }
 
+        dataInfo.sectorNum = sectorInfo.firstSector;
+
+        Sector *pSector = getSector(dataInfo.sectorNum);
+        if (!pSector) {
+            return false;
+        }
+
+        dataInfo.sectorCommon = pSector->c;
+
+        size_t addr = sectorNumToAddr(dataInfo.sectorNum);
+
+        dataInfo.index = 0;
+
+        uint16_t offset = sizeof(SectorHeader);
+        for(auto iter = pSector->records.begin(); iter != pSector->records.end(); iter++, dataInfo.index++) {
+            if ((iter->flags & RECORD_FLAG_READ_MASK) == RECORD_FLAG_READ_MASK) {
+                // Not marked as read
+                uint8_t *dataBuf = dataInfo.allocate(iter->size);
+                spiFlash->readData(addr + offset + sizeof(RecordCommon), dataBuf, dataInfo.size());
+
+                dataInfo.recordCommon = *iter;
+                bResult = true;
+                break;
+            }
+            offset += sizeof(RecordCommon) + iter->size;
+        }
+    }
 
     return bResult;
 }
 
 bool CircularBufferSpiFlashRK::markAsRead(const DataInfo &dataInfo) {
+    bool bResult = false;
     if (!isValid) {
         _log.error("%s not isValid", "markAsRead");
         return false;
     }
 
-    Sector *pSector = getSector(dataInfo.sectorNum);
-    if (!pSector) {
-        return false;
-    }
+    WITH_LOCK(*this) {
 
-    if (pSector->c.sequence != dataInfo.sectorCommon.sequence) {
-        _log.info("sector %d reused, not marking as read", (int)dataInfo.sectorNum);
-        return false;
-    }
+        Sector *pSector = getSector(dataInfo.sectorNum);
+        if (!pSector) {
+            return false;
+        }
 
-    bool bResult = true;
+        if (pSector->c.sequence != dataInfo.sectorCommon.sequence) {
+            _log.info("sector %d reused, not marking as read", (int)dataInfo.sectorNum);
+            return false;
+        }
 
-    size_t addr = sectorNumToAddr(dataInfo.sectorNum);
+        size_t addr = sectorNumToAddr(dataInfo.sectorNum);
 
-    if ((dataInfo.index + 1) >= pSector->records.size()) {
-        // This is the last record in the sector, erase the sector
-        writeSectorHeader(dataInfo.sectorNum, true /* erase */, ++lastSequence);
-    }
-    else {
-        // Just mark this record as read
-        size_t curIndex = 0;
-        uint16_t offset = sizeof(SectorHeader);
-        for(auto iter = pSector->records.begin(); iter != pSector->records.end(); iter++, curIndex++) {
-            if (curIndex == dataInfo.index) {
-                iter->flags &= ~RECORD_FLAG_READ_MASK;
-                spiFlash->writeData(addr + offset, &(*iter), sizeof(RecordCommon));
+        if ((dataInfo.index + 1) >= pSector->records.size()) {
+            // This is the last record in the sector, erase the sector
+            writeSectorHeader(dataInfo.sectorNum, true /* erase */, ++lastSequence);
+        }
+        else {
+            // Just mark this record as read
+            size_t curIndex = 0;
+            uint16_t offset = sizeof(SectorHeader);
+            for(auto iter = pSector->records.begin(); iter != pSector->records.end(); iter++, curIndex++) {
+                if (curIndex == dataInfo.index) {
+                    iter->flags &= ~RECORD_FLAG_READ_MASK;
+                    spiFlash->writeData(addr + offset, &(*iter), sizeof(RecordCommon));
+                }
             }
         }
+        bResult = true;
     }
 
     return bResult;
 }
 
 bool CircularBufferSpiFlashRK::writeData(const DataBuffer &data) {
+    bool bResult = false;
     if (!isValid) {
         _log.error("%s not isValid", "writeData");
         return false;
     }
 
-    return false;
+    WITH_LOCK(*this) {
+
+        SectorInfo sectorInfo;
+        if (!getSectorInfo(sectorInfo)) {
+            return false;
+        }
+        uint16_t sectorNum = sectorInfo.writeSector;
+        
+        Sector *pSector = getSector(sectorNum);
+        if (!pSector) {
+            return false;
+        }
+
+        bResult = appendDataToSector(pSector, data, ~0);
+        if (!bResult) {
+            // Sector is full, finalize this sector
+            finalizeSector(pSector);
+
+            // Start a new one
+            uint32_t lastSequence = pSector->c.sequence;
+            sectorNum++; // May wrap around
+
+            pSector = getSector(sectorNum);
+            if (!pSector) {
+                return false;
+            }
+
+            if (pSector->c.sequence <= lastSequence) {
+                // Wrapped around to a sector that hasn't been read yet
+                // writeSectorHeader updates pSector since it will be in the cache
+                writeSectorHeader(sectorNum, true /* erase */, ++lastSequence);
+            }
+
+            // Write data to the new sector
+            bResult = appendDataToSector(pSector, data, ~0);
+        }
+    }
+
+    return bResult;
 }
 
+bool CircularBufferSpiFlashRK::getUsageStats(UsageStats &usageStats) {
+    bool bResult = false;
+    if (!isValid) {
+        _log.error("%s not isValid", "writeData");
+        return false;
+    }
+
+    WITH_LOCK(*this) {
+    }
+    return bResult;
+}
+
+void CircularBufferSpiFlashRK::UsageStats::log(LogLevel level, const char *msg) const {
+    _log.log(level, "%s", msg);
+    
+}
 
 
 void CircularBufferSpiFlashRK::Sector::clear(uint16_t sectorNum) {
@@ -478,7 +555,7 @@ uint16_t CircularBufferSpiFlashRK::Sector::getLastOffset() const {
 
 
 
-void CircularBufferSpiFlashRK::Sector::log(const char *msg, bool includeData) const {
+void CircularBufferSpiFlashRK::Sector::log(LogLevel level, const char *msg, bool includeData) const {
     uint16_t lastOffset = getLastOffset();
 
     // bool isPrintable = true;
@@ -489,13 +566,13 @@ void CircularBufferSpiFlashRK::Sector::log(const char *msg, bool includeData) co
 
     _log.trace("logSector %s sectorNum=%d flags=0x%x sequence=%d lastOffset=%d", msg, (int)sectorNum, (int)c.flags, (int)c.sequence, (int)lastOffset); 
     if ((c.flags & SECTOR_FLAG_FINALIZED_MASK) == 0) {
-        _log.trace(" finalized recordCount=%d dataSize=%d", (int)c.recordCount, (int)c.dataSize); 
+        _log.log(level, " finalized recordCount=%d dataSize=%d", (int)c.recordCount, (int)c.dataSize); 
     }
 
 
     uint16_t offset = sizeof(SectorHeader);
     for(auto iter = records.begin(); iter != records.end(); iter++) {
-        _log.trace(" record offset=%d size=%d flags=%x", (int)offset, (int)iter->size, (int)iter->flags);        
+        _log.log(level, " record offset=%d size=%d flags=%x", (int)offset, (int)iter->size, (int)iter->flags);        
         offset += sizeof(RecordCommon) + iter->size;
     }
 }
