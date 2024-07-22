@@ -272,6 +272,7 @@ public:
      */
     class DataInfo : public DataBuffer {
     public:        
+        void log(LogLevel level, const char *msg) const;
         uint16_t sectorNum; //!< sector number that was read from
         SectorCommon sectorCommon; //!< Information about the sector. The sequence is what's used from this currently.
         size_t index; //!< The record index that was read

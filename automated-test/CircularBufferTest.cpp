@@ -215,7 +215,7 @@ void testUnitSectorAppend(std::vector<String> &testSet) {
                 printf("got: %s\nexp: %s\n", tempBuffer.c_str(), testSet.at(stringNum).c_str());
 
                 for(int tempStringIndex = 0; tempStringIndex < testSet.size(); tempStringIndex++) {
-                    if (randomStringSmall.at(tempStringIndex) == tempBuffer.c_str()) {
+                    if (testSet.at(tempStringIndex) == tempBuffer.c_str()) {
                         printf("found match at stringIndex=%d\n", tempStringIndex);
                         break;
                     }
@@ -276,6 +276,76 @@ void testUnitReadWrite(std::vector<String> &testSet) {
     }
 }
 
+void testUnitWrap(std::vector<String> &testSet) {
+    size_t testCount = 10000;
+
+    const uint16_t sectorCount = 100; // 409,600 bytes
+
+    CircularBufferSpiFlashRK circBuffer(&spiFlash, 0, sectorCount * 4096);
+    circBuffer.format();
+
+    int stringCount = testSet.size();
+    int readIndex = 0;
+    int writeIndex = 0;
+
+    // Write enough strings to fill a sector
+    CircularBufferSpiFlashRK::DataBuffer origBuffer(testSet.at(writeIndex++ % stringCount).c_str());
+    circBuffer.writeData(origBuffer);
+
+    // Start reading it, but don't mark as read
+    CircularBufferSpiFlashRK::DataInfo dataInfo;
+    assert(circBuffer.readData(dataInfo));
+    dataInfo.log(LOG_LEVEL_TRACE, "read1");
+
+    assert(strcmp(origBuffer.c_str(), dataInfo.c_str()) == 0);
+
+    // Now write enough messages to wrap
+    for(size_t ii = 0; ii < testCount; ii++) {
+        CircularBufferSpiFlashRK::DataBuffer origBuffer(testSet.at(writeIndex++ % stringCount).c_str());
+        circBuffer.writeData(origBuffer);
+    }
+    
+    // Mark as read (this should ignore the changed sector)
+    circBuffer.markAsRead(dataInfo);
+
+    assert(circBuffer.readData(dataInfo));
+    dataInfo.log(LOG_LEVEL_TRACE, "read2");
+    for(readIndex = 0; readIndex < stringCount; readIndex++) {
+        if (strcmp(testSet.at(readIndex), dataInfo.c_str()) == 0) {
+            break;
+        }
+    }
+    assert(readIndex < stringCount);
+    Log.info("%d: readIndex=%d", (int)readIndex, __LINE__);
+
+    for(size_t ii = 0; ii < testCount; ii++) {
+        bool bResult = circBuffer.readData(dataInfo);
+        if (!bResult) {
+            break;
+        }
+        dataInfo.log(LOG_LEVEL_TRACE, "read3");
+        if (strcmp(testSet.at(readIndex % stringCount), dataInfo.c_str()) != 0) {
+            printf("ii=%d readIndex=%d\n", (int)ii, (int)readIndex);
+            printf("got: %s\nexp: %s\n", dataInfo.c_str(), origBuffer.c_str());
+
+            for(int tempStringIndex = 0; tempStringIndex < testSet.size(); tempStringIndex++) {
+                if (testSet.at(tempStringIndex) == dataInfo.c_str()) {
+                    printf("found match at stringIndex=%d\n", tempStringIndex);
+                    break;
+                }
+            }
+
+            dataInfo.log(LOG_LEVEL_TRACE, "dataInfo");
+
+            assert(false);
+        }
+        readIndex++;
+
+        circBuffer.markAsRead(dataInfo);
+    }
+
+}
+
 void runUnitTests() {
     // Local unit tests only used off-device 
 
@@ -287,8 +357,10 @@ void runUnitTests() {
     testUnitSectorAppend(randomStringSmall);
     testUnitSectorAppend(randomString1024);
 
-
     testUnitReadWrite(randomStringSmall);
+
+    testUnitWrap(randomString1024);
+
 }
 
 

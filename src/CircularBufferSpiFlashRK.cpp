@@ -470,6 +470,11 @@ bool CircularBufferSpiFlashRK::markAsRead(const DataInfo &dataInfo) {
     return bResult;
 }
 
+void CircularBufferSpiFlashRK::DataInfo::log(LogLevel level, const char *msg) const {
+    _log.log(level, "%s sectorNum=%d sequence=%d flags=0x%x, recordIndex=%d", msg, (int)sectorNum, (int)sectorCommon.sequence, (int)sectorCommon.flags, (int)index);
+}
+
+
 bool CircularBufferSpiFlashRK::writeData(const DataBuffer &data) {
     bool bResult = false;
     if (!isValid) {
