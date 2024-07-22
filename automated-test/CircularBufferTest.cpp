@@ -163,76 +163,117 @@ void testDataBuffer() {
 
 void testUnitSectorAppend(std::vector<String> &testSet) {
     // Unit testing of sector append functions
-    {
-        const uint16_t sectorCount = 512;
+    // NOTE: This uses the low-level API to test internal functions directly. It's not an example of using the preferred API!
+    const uint16_t sectorCount = 512;
 
-        CircularBufferSpiFlashRK circBuffer(&spiFlash, 0, sectorCount * 4096);
-        circBuffer.format();
+    CircularBufferSpiFlashRK circBuffer(&spiFlash, 0, sectorCount * 4096);
+    circBuffer.format();
 
-        int stringNum = 0;
+    int stringNum = 0;
 
-        for(uint16_t sectorNum = 0; sectorNum < sectorCount && stringNum < testSet.size(); sectorNum++) {
-            CircularBufferSpiFlashRK::Sector *pSector = circBuffer.getSector(sectorNum);
+    for(uint16_t sectorNum = 0; sectorNum < sectorCount && stringNum < testSet.size(); sectorNum++) {
+        CircularBufferSpiFlashRK::Sector *pSector = circBuffer.getSector(sectorNum);
 
-            while(stringNum < testSet.size()) {
-                bool bResult;
+        while(stringNum < testSet.size()) {
+            bool bResult;
 
-                CircularBufferSpiFlashRK::DataBuffer origBuffer(testSet.at(stringNum).c_str());
-                bResult = circBuffer.appendDataToSector(pSector, origBuffer, 0xffff);
-                if (!bResult) {
-                    break;
-                }
-
-                stringNum++;
+            CircularBufferSpiFlashRK::DataBuffer origBuffer(testSet.at(stringNum).c_str());
+            bResult = circBuffer.appendDataToSector(pSector, origBuffer, 0xffff);
+            if (!bResult) {
+                break;
             }
 
-            circBuffer.finalizeSector(pSector);
-            // pSector->log("test");
+            stringNum++;
         }
 
-        
-        stringNum = 0;
-        bool error = false;
+        circBuffer.finalizeSector(pSector);
+        // pSector->log("test");
+    }
 
-        for(uint16_t sectorNum = 0; sectorNum < sectorCount && stringNum < testSet.size() && !error; sectorNum++) {
-            CircularBufferSpiFlashRK::Sector *pSector = circBuffer.getSector(sectorNum);
+    
+    stringNum = 0;
+    bool error = false;
 
-            int stringIndex = 0;
-            while(stringNum < testSet.size()) {
-                CircularBufferSpiFlashRK::DataBuffer tempBuffer;
-                CircularBufferSpiFlashRK::RecordCommon meta;
+    for(uint16_t sectorNum = 0; sectorNum < sectorCount && stringNum < testSet.size() && !error; sectorNum++) {
+        CircularBufferSpiFlashRK::Sector *pSector = circBuffer.getSector(sectorNum);
 
-                bool bResult = circBuffer.readDataFromSector(pSector, stringIndex, tempBuffer, meta);
-                if (!bResult) {
-                    break;
-                }
+        int stringIndex = 0;
+        while(stringNum < testSet.size()) {
+            CircularBufferSpiFlashRK::DataBuffer tempBuffer;
+            CircularBufferSpiFlashRK::RecordCommon meta;
 
-                if (strcmp(tempBuffer.c_str(), testSet.at(stringNum).c_str()) == 0) {
-
-                }
-                else {
-                    Log.error("mismatch line=%d stringIndex=%d stringNum=%d sectorNum=%d", __LINE__, stringIndex, (int)stringNum, (int)sectorNum );
-                    printf("got: %s\nexp: %s\n", tempBuffer.c_str(), testSet.at(stringNum).c_str());
-
-                    for(int tempStringIndex = 0; tempStringIndex < testSet.size(); tempStringIndex++) {
-                        if (randomStringSmall.at(tempStringIndex) == tempBuffer.c_str()) {
-                            printf("found match at stringIndex=%d\n", tempStringIndex);
-                            break;
-                        }
-                    }
-
-                    error = true;
-                    break;
-                }
-
-                stringNum++;
-                stringIndex++;
+            bool bResult = circBuffer.readDataFromSector(pSector, stringIndex, tempBuffer, meta);
+            if (!bResult) {
+                break;
             }
+
+            if (strcmp(tempBuffer.c_str(), testSet.at(stringNum).c_str()) == 0) {
+
+            }
+            else {
+                Log.error("mismatch line=%d stringIndex=%d stringNum=%d sectorNum=%d", __LINE__, stringIndex, (int)stringNum, (int)sectorNum );
+                printf("got: %s\nexp: %s\n", tempBuffer.c_str(), testSet.at(stringNum).c_str());
+
+                for(int tempStringIndex = 0; tempStringIndex < testSet.size(); tempStringIndex++) {
+                    if (randomStringSmall.at(tempStringIndex) == tempBuffer.c_str()) {
+                        printf("found match at stringIndex=%d\n", tempStringIndex);
+                        break;
+                    }
+                }
+
+                error = true;
+                break;
+            }
+
+            stringNum++;
+            stringIndex++;
         }
     }
 
 
 
+
+}
+
+void testUnitReadWrite(std::vector<String> &testSet) {
+    size_t testCount = 10;
+
+    const uint16_t sectorCount = 512;
+
+    CircularBufferSpiFlashRK circBuffer(&spiFlash, 0, sectorCount * 4096);
+    circBuffer.format();
+
+
+    int stringCount = testSet.size();
+    int readIndex = 0;
+    int writeIndex = 0;
+
+    for(size_t testNum = 0; testNum < testCount; testNum++) {
+        int numToWrite = rand() % 100;
+        for(int ii = 0; ii < numToWrite; ii++) {
+            CircularBufferSpiFlashRK::DataBuffer origBuffer(testSet.at(writeIndex++ % stringCount).c_str());
+            circBuffer.writeData(origBuffer);
+        }
+
+
+        // Read more than we write on average to avoid infinitely growing
+        int numToRead = rand() % 200;
+        for(int ii = 0; ii < numToRead; ii++) {
+            CircularBufferSpiFlashRK::DataInfo dataInfo;
+            if (circBuffer.readData(dataInfo)) {
+                circBuffer.markAsRead(dataInfo);
+
+                CircularBufferSpiFlashRK::DataBuffer origBuffer(testSet.at(readIndex++ % stringCount).c_str());
+
+                if (strcmp(origBuffer.c_str(), dataInfo.c_str()) != 0) {
+                    printf("testNum=%d ii=%d\n", (int)testNum, (int)ii);
+                    printf("got: %s\nexp: %s\n", dataInfo.c_str(), origBuffer.c_str());
+
+                    assert(false);
+                }
+            }
+        }
+    }
 }
 
 void runUnitTests() {
@@ -246,6 +287,8 @@ void runUnitTests() {
     testUnitSectorAppend(randomStringSmall);
     testUnitSectorAppend(randomString1024);
 
+
+    testUnitReadWrite(randomStringSmall);
 }
 
 

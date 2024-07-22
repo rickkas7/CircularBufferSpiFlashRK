@@ -299,6 +299,7 @@ public:
     class UsageStats {
     public:
         void log(LogLevel level, const char *msg) const;
+
     };
 
     /**
