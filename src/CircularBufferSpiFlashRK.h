@@ -229,14 +229,10 @@ public:
 
         void log(const char *msg, bool includeData = false) const;
 
-        void lock() { lockCount++; };
-        void unlock() { lockCount--; };
-
         uint16_t sectorNum = 0;
         uint16_t internalFlags = 0;
         std::vector<RecordCommon> records;
         SectorCommon c;
-        int lockCount = 0;
     };
 
 
@@ -271,6 +267,38 @@ public:
     bool fsck();
 
 
+    class DataInfo : public DataBuffer {
+    public:        
+        uint16_t sectorNum;
+        SectorCommon sectorCommon;
+        size_t index;
+        RecordCommon recordCommon;
+    };
+
+    /**
+     * @brief Read the next unread data from the circular buffer
+     * 
+     * @param dataInfo 
+     * @return true 
+     * @return false 
+     */
+    bool readData(DataInfo &dataInfo);
+
+    /**
+     * @brief Mark the data from readData as read
+     * 
+     * @param dataInfo 
+     * @return true 
+     * @return false 
+     */
+    bool markAsRead(const DataInfo &dataInfo);
+
+    bool writeData(const DataBuffer &data);
+
+
+#ifndef UNITTEST
+protected:
+#endif
     /**
      * @brief Get the Sector object for a sector if it exists in the cache
      * 
@@ -321,18 +349,6 @@ public:
     bool getSectorInfo(SectorInfo &sectorInfo) const;
 
 
-    class DataInfo : public DataBuffer {
-    public:        
-        uint16_t sectorNum;
-        SectorCommon sectorCommon;
-        size_t index;
-        RecordCommon recordCommon;
-    };
-
-    bool readData(DataInfo &dataInfo);
-
-    bool markAsRead(const DataInfo &dataInfo);
-
     /**
      * @brief Convert a sector number to an address
      * 
@@ -341,7 +357,7 @@ public:
      */
     uint32_t sectorNumToAddr(uint16_t sectorNum) const { return addrStart + sectorNum * spiFlash->getSectorSize(); };
 
-
+public:
     static const uint32_t SECTOR_MAGIC = 0x0ceb6443;
     static const uint32_t SECTOR_MAGIC_ERASED = 0xffffffff;
     static const uint32_t SECTOR_FLAG_IN_USE_MASK = 0x0001;
