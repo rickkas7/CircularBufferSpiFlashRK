@@ -82,7 +82,7 @@ String makeRandomString(size_t maxLen) {
 }
 
 void test02(SpiFlash *spiFlash) {
-    size_t testCount = 20;
+    size_t testCount = 1000;
     size_t maxLen = 128;
     size_t subTestSize = 20;
 
@@ -93,7 +93,12 @@ void test02(SpiFlash *spiFlash) {
     
     std::deque<String> strings;
 
+    int stringsTested = 0;
+
     for(size_t testNum = 0; testNum < testCount; testNum++) {
+        if ((testNum % 25) == 0) {
+            Log.info("test2 %d of %d", (int)testNum, (int)testCount);
+        }
         int numToWrite = rand() % subTestSize;
         for(int ii = 0; ii < numToWrite; ii++) {
             String s = makeRandomString(maxLen);
@@ -121,10 +126,14 @@ void test02(SpiFlash *spiFlash) {
 
                     return;
                 }
+                stringsTested++;
+            }
+            else {
+                break;
             }
         }
     }
-    Log.info("test2 complete");
+    Log.info("test2 complete stringsTested=%d", stringsTested);
 }
 
 void runTestSuite(SpiFlash *spiFlash) {
