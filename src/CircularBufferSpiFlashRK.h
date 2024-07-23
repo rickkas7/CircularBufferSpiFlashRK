@@ -270,7 +270,7 @@ public:
      * 
      * This class is derived from DataBuffer so it its methods can be used to access the data from readData
      */
-    class DataInfo : public DataBuffer {
+    class ReadInfo : public DataBuffer {
     public:        
         void log(LogLevel level, const char *msg) const;
         uint16_t sectorNum; //!< sector number that was read from
@@ -282,19 +282,19 @@ public:
     /**
      * @brief Read the next unread data from the circular buffer
      * 
-     * @param dataInfo 
+     * @param readInfo 
      * @return true 
      * @return false 
      * 
-     * After reading the data, you must pass the same dataInfo to markAsRead
+     * After reading the data, you must pass the same readInfo to markAsRead
      * otherwise you'll read the same data again.
      */
-    bool readData(DataInfo &dataInfo);
+    bool readData(ReadInfo &readInfo);
 
     /**
      * @brief Mark the data from readData as read
      * 
-     * @param dataInfo 
+     * @param readInfo 
      * @return true 
      * @return false 
      * 
@@ -302,7 +302,7 @@ public:
      * buffer was full and additional data was written to it. It will ignore the
      * mark as read in this case, because the data no longer exists.
      */
-    bool markAsRead(const DataInfo &dataInfo);
+    bool markAsRead(const ReadInfo &readInfo);
 
     /**
      * @brief Write data to the circular buffer

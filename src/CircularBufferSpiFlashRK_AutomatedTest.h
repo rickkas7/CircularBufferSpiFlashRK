@@ -97,7 +97,7 @@ void test02(SpiFlash *spiFlash) {
 
     for(size_t testNum = 0; testNum < testCount; testNum++) {
         if ((testNum % 25) == 0) {
-            Log.info("test2 %d of %d", (int)testNum, (int)testCount);
+            Log.trace("test2 %d of %d", (int)testNum, (int)testCount);
         }
         int numToWrite = rand() % subTestSize;
         for(int ii = 0; ii < numToWrite; ii++) {
@@ -112,16 +112,16 @@ void test02(SpiFlash *spiFlash) {
         // Read more than we write on average to avoid infinitely growing
         int numToRead = rand() % (2 * subTestSize);
         for(int ii = 0; ii < numToRead; ii++) {
-            CircularBufferSpiFlashRK::DataInfo dataInfo;
-            if (circBuffer.readData(dataInfo)) {
-                circBuffer.markAsRead(dataInfo);
+            CircularBufferSpiFlashRK::ReadInfo readInfo;
+            if (circBuffer.readData(readInfo)) {
+                circBuffer.markAsRead(readInfo);
 
                 CircularBufferSpiFlashRK::DataBuffer origBuffer(strings.front());
                 strings.pop_front();
 
-                if (strcmp(origBuffer.c_str(), dataInfo.c_str()) != 0) {
-                    Log.info("testNum=%d ii=%d", (int)testNum, (int)ii);
-                    Log.info("got: %s", dataInfo.c_str());
+                if (strcmp(origBuffer.c_str(), readInfo.c_str()) != 0) {
+                    Log.error("testNum=%d ii=%d", (int)testNum, (int)ii);
+                    Log.info("got: %s", readInfo.c_str());
                     Log.info("exp: %s\n", origBuffer.c_str());
 
                     return;

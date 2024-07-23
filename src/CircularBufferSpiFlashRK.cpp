@@ -410,7 +410,7 @@ void CircularBufferSpiFlashRK::SectorInfo::log(LogLevel level, const char *msg) 
 
 }
 
-bool CircularBufferSpiFlashRK::readData(DataInfo &dataInfo) {
+bool CircularBufferSpiFlashRK::readData(ReadInfo &readInfo) {
     bool bResult = false;
 
     if (!isValid) {
@@ -425,27 +425,27 @@ bool CircularBufferSpiFlashRK::readData(DataInfo &dataInfo) {
             return false;
         }
 
-        dataInfo.sectorNum = sectorInfo.firstSector;
+        readInfo.sectorNum = sectorInfo.firstSector;
 
-        Sector *pSector = getSector(dataInfo.sectorNum);
+        Sector *pSector = getSector(readInfo.sectorNum);
         if (!pSector) {
             return false;
         }
 
-        dataInfo.sectorCommon = pSector->c;
+        readInfo.sectorCommon = pSector->c;
 
-        size_t addr = sectorNumToAddr(dataInfo.sectorNum);
+        size_t addr = sectorNumToAddr(readInfo.sectorNum);
 
-        dataInfo.index = 0;
+        readInfo.index = 0;
 
         uint16_t offset = sizeof(SectorHeader);
-        for(auto iter = pSector->records.begin(); iter != pSector->records.end(); iter++, dataInfo.index++) {
+        for(auto iter = pSector->records.begin(); iter != pSector->records.end(); iter++, readInfo.index++) {
             if ((iter->flags & RECORD_FLAG_READ_MASK) == RECORD_FLAG_READ_MASK) {
                 // Not marked as read
-                uint8_t *dataBuf = dataInfo.allocate(iter->size);
-                spiFlash->readData(addr + offset + sizeof(RecordCommon), dataBuf, dataInfo.size());
+                uint8_t *dataBuf = readInfo.allocate(iter->size);
+                spiFlash->readData(addr + offset + sizeof(RecordCommon), dataBuf, readInfo.size());
 
-                dataInfo.recordCommon = *iter;
+                readInfo.recordCommon = *iter;
                 bResult = true;
                 break;
             }
@@ -456,7 +456,7 @@ bool CircularBufferSpiFlashRK::readData(DataInfo &dataInfo) {
     return bResult;
 }
 
-bool CircularBufferSpiFlashRK::markAsRead(const DataInfo &dataInfo) {
+bool CircularBufferSpiFlashRK::markAsRead(const ReadInfo &readInfo) {
     bool bResult = false;
     if (!isValid) {
         _log.error("%s not isValid", "markAsRead");
@@ -465,28 +465,28 @@ bool CircularBufferSpiFlashRK::markAsRead(const DataInfo &dataInfo) {
 
     WITH_LOCK(*this) {
 
-        Sector *pSector = getSector(dataInfo.sectorNum);
+        Sector *pSector = getSector(readInfo.sectorNum);
         if (!pSector) {
             return false;
         }
 
-        if (pSector->c.sequence != dataInfo.sectorCommon.sequence) {
-            _log.info("sector %d reused, not marking as read", (int)dataInfo.sectorNum);
+        if (pSector->c.sequence != readInfo.sectorCommon.sequence) {
+            _log.info("sector %d reused, not marking as read", (int)readInfo.sectorNum);
             return false;
         }
 
-        size_t addr = sectorNumToAddr(dataInfo.sectorNum);
+        size_t addr = sectorNumToAddr(readInfo.sectorNum);
 
-        if ((dataInfo.index + 1) >= pSector->records.size()) {
+        if ((readInfo.index + 1) >= pSector->records.size()) {
             // This is the last record in the sector, erase the sector
-            writeSectorHeader(dataInfo.sectorNum, true /* erase */, ++lastSequence);
+            writeSectorHeader(readInfo.sectorNum, true /* erase */, ++lastSequence);
         }
         else {
             // Just mark this record as read
             size_t curIndex = 0;
             uint16_t offset = sizeof(SectorHeader);
             for(auto iter = pSector->records.begin(); iter != pSector->records.end(); iter++, curIndex++) {
-                if (curIndex == dataInfo.index) {
+                if (curIndex == readInfo.index) {
                     iter->flags &= ~RECORD_FLAG_READ_MASK;
                     spiFlash->writeData(addr + offset, &(*iter), sizeof(RecordCommon));
                 }
@@ -498,7 +498,7 @@ bool CircularBufferSpiFlashRK::markAsRead(const DataInfo &dataInfo) {
     return bResult;
 }
 
-void CircularBufferSpiFlashRK::DataInfo::log(LogLevel level, const char *msg) const {
+void CircularBufferSpiFlashRK::ReadInfo::log(LogLevel level, const char *msg) const {
     _log.log(level, "%s sectorNum=%d sequence=%d flags=0x%x, recordIndex=%d", msg, (int)sectorNum, (int)sectorCommon.sequence, (int)sectorCommon.flags, (int)index);
 }
 

@@ -259,15 +259,15 @@ void testUnitReadWrite(std::vector<String> &testSet) {
         // Read more than we write on average to avoid infinitely growing
         int numToRead = rand() % 200;
         for(int ii = 0; ii < numToRead; ii++) {
-            CircularBufferSpiFlashRK::DataInfo dataInfo;
-            if (circBuffer.readData(dataInfo)) {
-                circBuffer.markAsRead(dataInfo);
+            CircularBufferSpiFlashRK::ReadInfo readInfo;
+            if (circBuffer.readData(readInfo)) {
+                circBuffer.markAsRead(readInfo);
 
                 CircularBufferSpiFlashRK::DataBuffer origBuffer(testSet.at(readIndex++ % stringCount).c_str());
 
-                if (strcmp(origBuffer.c_str(), dataInfo.c_str()) != 0) {
+                if (strcmp(origBuffer.c_str(), readInfo.c_str()) != 0) {
                     printf("testNum=%d ii=%d\n", (int)testNum, (int)ii);
-                    printf("got: %s\nexp: %s\n", dataInfo.c_str(), origBuffer.c_str());
+                    printf("got: %s\nexp: %s\n", readInfo.c_str(), origBuffer.c_str());
 
                     assert(false);
                 }
@@ -286,63 +286,49 @@ void testUnitWrap(std::vector<String> &testSet) {
     circBuffer.format();
 
     int stringCount = testSet.size();
-    int readIndex = 0;
     int writeIndex = 0;
 
-    // Write enough strings to fill a sector
-    CircularBufferSpiFlashRK::DataBuffer origBuffer(testSet.at(writeIndex++ % stringCount).c_str());
-    circBuffer.writeData(origBuffer);
-
-    // Start reading it, but don't mark as read
-    CircularBufferSpiFlashRK::DataInfo dataInfo;
-    assert(circBuffer.readData(dataInfo));
-    dataInfo.log(LOG_LEVEL_TRACE, "read1");
-
-    assert(strcmp(origBuffer.c_str(), dataInfo.c_str()) == 0);
-
-    // Now write enough messages to wrap
+    // Write enough messages to wrap
     for(size_t ii = 0; ii < testCount; ii++) {
         CircularBufferSpiFlashRK::DataBuffer origBuffer(testSet.at(writeIndex++ % stringCount).c_str());
         circBuffer.writeData(origBuffer);
     }
+
+    int lastRead = -1;
     
-    // Mark as read (this should ignore the changed sector)
-    circBuffer.markAsRead(dataInfo);
-
-    assert(circBuffer.readData(dataInfo));
-    dataInfo.log(LOG_LEVEL_TRACE, "read2");
-    for(readIndex = 0; readIndex < stringCount; readIndex++) {
-        if (strcmp(testSet.at(readIndex), dataInfo.c_str()) == 0) {
-            break;
-        }
-    }
-    assert(readIndex < stringCount);
-    Log.info("%d: readIndex=%d", (int)readIndex, __LINE__);
-
     for(size_t ii = 0; ii < testCount; ii++) {
-        bool bResult = circBuffer.readData(dataInfo);
+        CircularBufferSpiFlashRK::ReadInfo readInfo;
+        bool bResult = circBuffer.readData(readInfo);
         if (!bResult) {
             break;
         }
-        dataInfo.log(LOG_LEVEL_TRACE, "read3");
-        if (strcmp(testSet.at(readIndex % stringCount), dataInfo.c_str()) != 0) {
-            printf("ii=%d readIndex=%d\n", (int)ii, (int)readIndex);
-            printf("got: %s\nexp: %s\n", dataInfo.c_str(), origBuffer.c_str());
 
-            for(int tempStringIndex = 0; tempStringIndex < testSet.size(); tempStringIndex++) {
-                if (testSet.at(tempStringIndex) == dataInfo.c_str()) {
-                    printf("found match at stringIndex=%d\n", tempStringIndex);
-                    break;
-                }
+        int foundIndex = -1;
+
+        for(int tempStringIndex = 0; tempStringIndex < testSet.size(); tempStringIndex++) {
+            if (testSet.at(tempStringIndex) == readInfo.c_str()) {
+                foundIndex = tempStringIndex;
+                break;
             }
+        }
 
-            dataInfo.log(LOG_LEVEL_TRACE, "dataInfo");
+        if (foundIndex < 0) {
+            printf("testUnitWrap ii=%d\n", (int)ii);
+            printf("got: %s\nexp: %s\n", readInfo.c_str());
+
+
+            readInfo.log(LOG_LEVEL_TRACE, "readInfo");
 
             assert(false);
         }
-        readIndex++;
+        if (lastRead >= 0) {
+            if (foundIndex != (lastRead + 1)) {
+                printf("testUnitWrap incorrect string ii=%d lastRead=%d foundIndex=%d\n", ii, lastRead, foundIndex);
+            }
+        }
+        lastRead = foundIndex;
 
-        circBuffer.markAsRead(dataInfo);
+        circBuffer.markAsRead(readInfo);
     }
 
 }
@@ -361,7 +347,7 @@ void runUnitTests() {
     testUnitReadWrite(randomStringSmall);
 
     
-    // testUnitWrap(randomString1024); // Does not currently work!
+    testUnitWrap(randomString1024);
 
 }
 
