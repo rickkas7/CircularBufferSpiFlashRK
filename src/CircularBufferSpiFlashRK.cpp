@@ -380,28 +380,30 @@ bool CircularBufferSpiFlashRK::getSectorInfo(SectorInfo &sectorInfo) const {
     }
     sectorInfo.firstSector = sectorInfo.lastSector = 0;
 
-    for(uint16_t sectorNum = 0; sectorNum < sectorCount; sectorNum++) {
-        if ((sectorMeta[sectorNum].flags & SECTOR_FLAG_CORRUPTED_MASK) == 0) {
+    for(uint16_t sectorNum = 0; sectorNum < sectorCount * 2; sectorNum++) {
+        if ((sectorMeta[sectorNum % sectorCount].flags & SECTOR_FLAG_CORRUPTED_MASK) == 0) {
             // This sector is corrupted, ignore
             continue;
         }
 
-        if (sectorMeta[sectorNum].sequence < sectorMeta[sectorInfo.firstSector].sequence) {
+        if (sectorMeta[sectorNum % sectorCount].sequence < sectorMeta[sectorInfo.firstSector].sequence) {
             sectorInfo.firstSector = sectorNum;
         }
-        if (sectorMeta[sectorNum].sequence > sectorMeta[sectorInfo.lastSector].sequence) {
+        if (sectorMeta[sectorNum % sectorCount].sequence > sectorMeta[sectorInfo.lastSector].sequence) {
             sectorInfo.lastSector = sectorNum;
         }        
     }
 
+    /*
     if (sectorInfo.firstSector > sectorInfo.lastSector) {
         // Wraps around
         sectorInfo.lastSector += sectorCount;
     }
+    */
 
     sectorInfo.writeSector = sectorInfo.firstSector;
 
-    for(uint16_t sectorNum = sectorInfo.firstSector; sectorNum < sectorInfo.lastSector; sectorNum++) {
+    for(uint16_t sectorNum = sectorInfo.firstSector; sectorNum <= sectorInfo.lastSector; sectorNum++) {
         // Note: sectorNum may be > sectorCount because of wrapping!
         if ((sectorMeta[sectorNum % sectorCount].flags & SECTOR_FLAG_FINALIZED_MASK) == SECTOR_FLAG_FINALIZED_MASK) {
             // Finalized bit is not cleared, so this sector has not been finalized
@@ -525,6 +527,8 @@ bool CircularBufferSpiFlashRK::writeData(const DataBuffer &data) {
         if (!getSectorInfo(sectorInfo)) {
             return false;
         }
+        sectorInfo.log(LOG_LEVEL_TRACE, "writeData");
+
         uint16_t sectorNum = sectorInfo.writeSector;
         
         Sector *pSector = getSector(sectorNum);
@@ -538,8 +542,6 @@ bool CircularBufferSpiFlashRK::writeData(const DataBuffer &data) {
             finalizeSector(pSector);
 
             // Start a new one
-            uint32_t lastSequence = pSector->c.sequence;
-
             _log.trace("sector %d (seq %d) full, starting new sector", (int)sectorNum, (int)lastSequence);
 
             sectorNum++; // May wrap around
@@ -558,7 +560,7 @@ bool CircularBufferSpiFlashRK::writeData(const DataBuffer &data) {
 
                 // _log.trace("pSector sectorNum=%d", (int)pSector->sectorNum);
             }
-            // pSector->log(LOG_LEVEL_TRACE, "starting new sector");
+            pSector->log(LOG_LEVEL_TRACE, "starting new sector");
 
             // Write data to the new sector
             bResult = appendDataToSector(pSector, data, ~0);

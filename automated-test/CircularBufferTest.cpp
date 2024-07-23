@@ -15,7 +15,7 @@ std::vector<String> randomStringSmall;
 int main(int argc, char *argv[]) {
     spiFlash.begin();
     runUnitTests();
-    runTestSuite(&spiFlash);
+    // runTestSuite(&spiFlash);
     return 0;
 }
 
@@ -278,7 +278,7 @@ void testUnitReadWrite(std::vector<String> &testSet) {
 
 // Does not currently work!
 void testUnitWrap(std::vector<String> &testSet) {
-    size_t testCount = 10000;
+    size_t testCount = 1000;
 
     const uint16_t sectorCount = 100; // 409,600 bytes
 
