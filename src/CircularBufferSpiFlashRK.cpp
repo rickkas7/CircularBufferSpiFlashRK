@@ -274,6 +274,7 @@ bool CircularBufferSpiFlashRK::writeSectorHeader(uint16_t sectorNum, bool erase,
     // Update cache
     Sector *pSector = getSectorFromCache(sectorNum);
     if (pSector) {
+        pSector->clear(sectorNum);
         pSector->c = sectorHeader.c;
     }
 
@@ -290,6 +291,14 @@ bool CircularBufferSpiFlashRK::appendDataToSector(Sector *sector, const DataBuff
     }
 
     size_t addr = sectorNumToAddr(sector->sectorNum);
+
+    if ((sector->c.flags & SECTOR_FLAG_STARTED_MASK) == SECTOR_FLAG_STARTED_MASK) {
+        // First use of this sector
+        sector->c.flags &= ~SECTOR_FLAG_STARTED_MASK;
+        sectorMeta[sector->sectorNum] = sector->c;
+        spiFlash->writeData(addr, &sector->c, sizeof(SectorHeader));
+    }
+
 
     uint16_t offset = sector->getLastOffset();
 
@@ -530,6 +539,9 @@ bool CircularBufferSpiFlashRK::writeData(const DataBuffer &data) {
 
             // Start a new one
             uint32_t lastSequence = pSector->c.sequence;
+
+            _log.trace("sector %d (seq %d) full, starting new sector", (int)sectorNum, (int)lastSequence);
+
             sectorNum++; // May wrap around
 
             pSector = getSector(sectorNum);
@@ -537,11 +549,16 @@ bool CircularBufferSpiFlashRK::writeData(const DataBuffer &data) {
                 return false;
             }
 
-            if (pSector->c.sequence <= lastSequence) {
-                // Wrapped around to a sector that hasn't been read yet
+            if ((pSector->c.flags & SECTOR_FLAG_STARTED_MASK) == 0) {
+                // Sector has been used and needs to be erased
+
                 // writeSectorHeader updates pSector since it will be in the cache
                 writeSectorHeader(sectorNum, true /* erase */, ++lastSequence);
+                _log.trace("overwriting old sectorNum=%d, new sequence=%d", (int)sectorNum, (int)lastSequence);
+
+                // _log.trace("pSector sectorNum=%d", (int)pSector->sectorNum);
             }
+            // pSector->log(LOG_LEVEL_TRACE, "starting new sector");
 
             // Write data to the new sector
             bResult = appendDataToSector(pSector, data, ~0);

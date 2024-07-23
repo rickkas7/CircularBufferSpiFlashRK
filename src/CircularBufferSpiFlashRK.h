@@ -404,8 +404,9 @@ protected:
 
     static const uint32_t SECTOR_MAGIC = 0x0ceb6443;
     static const uint32_t SECTOR_MAGIC_ERASED = 0xffffffff;
-    static const uint32_t SECTOR_FLAG_FINALIZED_MASK = 0x01;
-    static const uint32_t SECTOR_FLAG_CORRUPTED_MASK = 0x02;
+    static const uint32_t SECTOR_FLAG_STARTED_MASK = 0x01;
+    static const uint32_t SECTOR_FLAG_FINALIZED_MASK = 0x02;
+    static const uint32_t SECTOR_FLAG_CORRUPTED_MASK = 0x04;
 
     static const uint16_t RECORD_FLAG_READ_MASK = 0x0001;
 
