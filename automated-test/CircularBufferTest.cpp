@@ -252,7 +252,11 @@ void testUnitReadWrite(std::vector<String> &testSet) {
         int numToWrite = rand() % 100;
         for(int ii = 0; ii < numToWrite; ii++) {
             CircularBufferSpiFlashRK::DataBuffer origBuffer(testSet.at(writeIndex++ % stringCount).c_str());
-            circBuffer.writeData(origBuffer);
+            bool bResult = circBuffer.writeData(origBuffer);
+            if (!bResult) {
+                printf("testUnitReadWrite writeData failed ii=%d\n", (int)ii);
+                break;
+            }
         }
 
 
@@ -291,7 +295,11 @@ void testUnitWrap(std::vector<String> &testSet) {
     // Write enough messages to wrap
     for(size_t ii = 0; ii < testCount; ii++) {
         CircularBufferSpiFlashRK::DataBuffer origBuffer(testSet.at(writeIndex++ % stringCount).c_str());
-        circBuffer.writeData(origBuffer);
+        bool bResult =circBuffer.writeData(origBuffer);
+        if (!bResult) {
+            printf("testUnitWrap writeData failed ii=%d\n", (int)ii);
+            break;
+        }
     }
 
     int lastRead = -1;
@@ -314,7 +322,7 @@ void testUnitWrap(std::vector<String> &testSet) {
 
         if (foundIndex < 0) {
             printf("testUnitWrap ii=%d\n", (int)ii);
-            printf("got: %s\nexp: %s\n", readInfo.c_str());
+            printf("got: %s\n", readInfo.c_str());
 
 
             readInfo.log(LOG_LEVEL_TRACE, "readInfo");
@@ -323,7 +331,7 @@ void testUnitWrap(std::vector<String> &testSet) {
         }
         if (lastRead >= 0) {
             if (foundIndex != (lastRead + 1)) {
-                printf("testUnitWrap incorrect string ii=%d lastRead=%d foundIndex=%d\n", ii, lastRead, foundIndex);
+                printf("testUnitWrap incorrect string ii=%d lastRead=%d foundIndex=%d\n", (int)ii, (int)lastRead, (int)foundIndex);
             }
         }
         lastRead = foundIndex;

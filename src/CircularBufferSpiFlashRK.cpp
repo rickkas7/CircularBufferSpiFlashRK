@@ -6,7 +6,7 @@ CircularBufferSpiFlashRK::CircularBufferSpiFlashRK(SpiFlash *spiFlash, size_t ad
     spiFlash(spiFlash), addrStart(addrStart), addrEnd(addrEnd) {
 
 #ifndef UNITTEST
-    os_mutex_create(&mutex);
+    os_mutex_recursive_create(&mutex);
 #endif
 
     if ((addrStart % spiFlash->getSectorSize()) != 0) {
@@ -33,6 +33,9 @@ CircularBufferSpiFlashRK::~CircularBufferSpiFlashRK() {
         delete sectorCache.back();
         sectorCache.pop_back();
     }
+#ifndef UNITTEST
+    os_mutex_recursive_destroy(&mutex);
+#endif
 
 }
 
@@ -47,6 +50,9 @@ bool CircularBufferSpiFlashRK::load() {
             return false;
         }
 
+        firstSequence = writeSequence = 0xffffffff;
+        lastSequence = 0;
+
         for(int sectorIndex = 0; sectorIndex < (int)sectorCount; sectorIndex++) {
             SectorHeader sectorHeader;
 
@@ -54,11 +60,18 @@ bool CircularBufferSpiFlashRK::load() {
             sectorMeta[sectorIndex] = sectorHeader.c;
 
             if (sectorHeader.sectorMagic == SECTOR_MAGIC) {
-
+                if (sectorHeader.c.sequence < firstSequence) {
+                    firstSequence = sectorHeader.c.sequence;
+                }
                 if (sectorHeader.c.sequence > lastSequence) {
                     lastSequence = sectorHeader.c.sequence;
                 }
-
+                if ((sectorHeader.c.flags & SECTOR_FLAG_FINALIZED_MASK) == SECTOR_FLAG_FINALIZED_MASK) {
+                    // Not finalized
+                    if (sectorHeader.c.sequence < writeSequence) {
+                        writeSequence = sectorHeader.c.sequence;
+                    }
+                }
                 // _log.trace("loading sectorIndex=%d sequence=%d flags=0x%x", sectorIndex, (int)sectorHeader.c.sequence, (int)sectorHeader.c.flags);
             }
             else {
@@ -73,9 +86,7 @@ bool CircularBufferSpiFlashRK::load() {
 
         // TODO: Check that sequence numbers are reasonable
 
-        SectorInfo sectorInfo;
-        getSectorInfo(sectorInfo);
-        sectorInfo.log(LOG_LEVEL_TRACE, "load");
+        _log.trace("firstSequence=%d writeSequence=%d lastSequence=%d", (int)firstSequence, (int)writeSequence, (int)lastSequence);
     }
 
     return bResult;
@@ -371,54 +382,17 @@ bool CircularBufferSpiFlashRK::readDataFromSector(Sector *sector, size_t index, 
     return bResult;
 }
 
+bool CircularBufferSpiFlashRK::sequenceToSectorNum(uint32_t sequence, uint16_t &sectorNum) const {
+    bool bResult = false;
 
-bool CircularBufferSpiFlashRK::getSectorInfo(SectorInfo &sectorInfo) const {
-
-    if (!isValid) {
-        _log.error("%s not isValid", "getSectorInfo");
-        return false;
-    }
-    sectorInfo.firstSector = sectorInfo.lastSector = 0;
-
-    for(uint16_t sectorNum = 0; sectorNum < sectorCount * 2; sectorNum++) {
-        if ((sectorMeta[sectorNum % sectorCount].flags & SECTOR_FLAG_CORRUPTED_MASK) == 0) {
-            // This sector is corrupted, ignore
-            continue;
-        }
-
-        if (sectorMeta[sectorNum % sectorCount].sequence < sectorMeta[sectorInfo.firstSector].sequence) {
-            sectorInfo.firstSector = sectorNum;
-        }
-        if (sectorMeta[sectorNum % sectorCount].sequence > sectorMeta[sectorInfo.lastSector].sequence) {
-            sectorInfo.lastSector = sectorNum;
-        }        
-    }
-
-    /*
-    if (sectorInfo.firstSector > sectorInfo.lastSector) {
-        // Wraps around
-        sectorInfo.lastSector += sectorCount;
-    }
-    */
-
-    sectorInfo.writeSector = sectorInfo.firstSector;
-
-    for(uint16_t sectorNum = sectorInfo.firstSector; sectorNum <= sectorInfo.lastSector; sectorNum++) {
-        // Note: sectorNum may be > sectorCount because of wrapping!
-        if ((sectorMeta[sectorNum % sectorCount].flags & SECTOR_FLAG_FINALIZED_MASK) == SECTOR_FLAG_FINALIZED_MASK) {
-            // Finalized bit is not cleared, so this sector has not been finalized
-            sectorInfo.writeSector = sectorNum;
+    for(uint16_t tempSectorNum = 0; tempSectorNum < sectorCount; tempSectorNum++) {
+        if (sectorMeta[tempSectorNum].sequence == sequence) {
+            sectorNum = tempSectorNum;
+            bResult = true;
             break;
-        }
+        }   
     }
-    
-    return true;
-}
-
-void CircularBufferSpiFlashRK::SectorInfo::log(LogLevel level, const char *msg) const {
-
-    _log.log(level, "%s firstSector=%d lastSector=%d writeSector=%d", msg, (int)firstSector, (int)lastSector, (int)writeSector);
-
+    return bResult;
 }
 
 bool CircularBufferSpiFlashRK::readData(ReadInfo &readInfo) {
@@ -430,16 +404,14 @@ bool CircularBufferSpiFlashRK::readData(ReadInfo &readInfo) {
     }
 
     WITH_LOCK(*this) {
-
-        SectorInfo sectorInfo;
-        if (!getSectorInfo(sectorInfo)) {
+        if (!sequenceToSectorNum(firstSequence, readInfo.sectorNum)) {
+            _log.error("%s firstSequence %d not found", "readData", (int)firstSequence);
             return false;
         }
 
-        readInfo.sectorNum = sectorInfo.firstSector;
-
         Sector *pSector = getSector(readInfo.sectorNum);
         if (!pSector) {
+            _log.error("%s getSector %d failed", "readData", (int)readInfo.sectorNum);
             return false;
         }
 
@@ -462,6 +434,8 @@ bool CircularBufferSpiFlashRK::readData(ReadInfo &readInfo) {
             }
             offset += sizeof(RecordCommon) + iter->size;
         }
+
+        // _log.trace("%s called with no unread data in sector %d", "readData", (int)readInfo.sectorNum);
     }
 
     return bResult;
@@ -482,14 +456,15 @@ bool CircularBufferSpiFlashRK::markAsRead(const ReadInfo &readInfo) {
         }
 
         if (pSector->c.sequence != readInfo.sectorCommon.sequence) {
-            _log.info("sector %d reused, not marking as read", (int)readInfo.sectorNum);
+            _log.info("%s sector %d reused, not marking as read", "markAsRead", (int)readInfo.sectorNum);
             return false;
         }
 
         size_t addr = sectorNumToAddr(readInfo.sectorNum);
 
-        if ((readInfo.index + 1) >= pSector->records.size()) {
-            // This is the last record in the sector, erase the sector
+        if ((readInfo.index + 1) >= pSector->records.size() && (pSector->c.flags & SECTOR_FLAG_FINALIZED_MASK) == 0) {
+            // This is the last record in the sector, erase the sector if finalized
+            firstSequence++;
             writeSectorHeader(readInfo.sectorNum, true /* erase */, ++lastSequence);
         }
         else {
@@ -522,17 +497,16 @@ bool CircularBufferSpiFlashRK::writeData(const DataBuffer &data) {
     }
 
     WITH_LOCK(*this) {
-
-        SectorInfo sectorInfo;
-        if (!getSectorInfo(sectorInfo)) {
+        
+        uint16_t sectorNum;
+        if (!sequenceToSectorNum(writeSequence, sectorNum)) {
+            _log.error("%s writeSequence %d not found", "writeData", (int)writeSequence);
             return false;
         }
-        sectorInfo.log(LOG_LEVEL_TRACE, "writeData");
-
-        uint16_t sectorNum = sectorInfo.writeSector;
-        
+       
         Sector *pSector = getSector(sectorNum);
         if (!pSector) {
+            _log.error("%s getSector %d failed", "writeData", (int)sectorNum);
             return false;
         }
 
@@ -540,9 +514,10 @@ bool CircularBufferSpiFlashRK::writeData(const DataBuffer &data) {
         if (!bResult) {
             // Sector is full, finalize this sector
             finalizeSector(pSector);
+            writeSequence++;
 
             // Start a new one
-            _log.trace("sector %d (seq %d) full, starting new sector", (int)sectorNum, (int)lastSequence);
+            // _log.trace("%s sector %d (seq %d) full, starting new sector", "writeData", (int)sectorNum, (int)writeSequence);
 
             sectorNum++; // May wrap around
 
@@ -553,14 +528,17 @@ bool CircularBufferSpiFlashRK::writeData(const DataBuffer &data) {
 
             if ((pSector->c.flags & SECTOR_FLAG_STARTED_MASK) == 0) {
                 // Sector has been used and needs to be erased
+                if (firstSequence == pSector->c.sequence) {
+                    firstSequence++;
+                }
 
                 // writeSectorHeader updates pSector since it will be in the cache
                 writeSectorHeader(sectorNum, true /* erase */, ++lastSequence);
-                _log.trace("overwriting old sectorNum=%d, new sequence=%d", (int)sectorNum, (int)lastSequence);
+                // _log.trace("%s overwriting old sectorNum=%d, new sequence=%d", "writeData", (int)sectorNum, (int)lastSequence);
 
                 // _log.trace("pSector sectorNum=%d", (int)pSector->sectorNum);
             }
-            pSector->log(LOG_LEVEL_TRACE, "starting new sector");
+            // pSector->log(LOG_LEVEL_TRACE, "starting new sector");
 
             // Write data to the new sector
             bResult = appendDataToSector(pSector, data, ~0);

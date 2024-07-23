@@ -384,15 +384,7 @@ protected:
 
     bool readDataFromSector(Sector *sector, size_t index, DataBuffer &data, RecordCommon &meta);
 
-    class SectorInfo {
-    public:
-        void log(LogLevel level, const char *msg) const;
-
-        uint16_t firstSector;
-        uint16_t lastSector;
-        uint16_t writeSector;
-    };
-    bool getSectorInfo(SectorInfo &sectorInfo) const;
+    bool sequenceToSectorNum(uint32_t sequence, uint16_t &sectorNum) const;
 
     /**
      * @brief Convert a sector number to an address
@@ -424,19 +416,19 @@ public:
      * 
      * The mutex is not recursive so do not lock it within a locked section.
      */
-    void lock() { os_mutex_lock(mutex); };
+    void lock() { os_mutex_recursive_lock(mutex); };
 
     /**
      * @brief Attempts to lock the mutex that protects shared resources
      * 
      * @return true if the mutex was locked or false if it was busy already.
      */
-    bool tryLock() { return os_mutex_trylock(mutex); };
+    bool tryLock() { return os_mutex_recursive_trylock(mutex); };
 
     /**
      * @brief Unlocks the mutex that protects shared resources
      */
-    void unlock() { os_mutex_unlock(mutex); };
+    void unlock() { os_mutex_recursive_unlock(mutex); };
 #else
     void lock() {};
     bool tryLock() { return true; };
@@ -464,6 +456,8 @@ protected:
     bool isValid = false;
     std::deque<Sector*> sectorCache;
 
+    uint32_t firstSequence = 0;
+    uint32_t writeSequence = 0;
     uint32_t lastSequence = 0;
 
     /**
@@ -472,7 +466,7 @@ protected:
      * This is initialized in setup() so make sure you call the setup() method from the global application setup.
      */
 #ifndef UNITTEST
-    os_mutex_t mutex = 0;
+    os_mutex_recursive_t mutex = 0;
 #endif
 
 };
