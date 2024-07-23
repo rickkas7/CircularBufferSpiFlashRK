@@ -92,18 +92,46 @@ bool CircularBufferSpiFlashRK::format() {
         for(uint16_t sectorNum = 0; sectorNum < sectorCount; sectorNum++) {
             writeSectorHeader(sectorNum, true /* erase */, sequence++);
         }
-
-        bResult = load();
     }
+
+    // load obtains the lock again, so this must be outside the lock otherwise deadlock will occur
+    bResult = load();
 
     return bResult;
 }
 
 bool CircularBufferSpiFlashRK::fsck() {
-    WITH_LOCK(*this) {
-    }
+    bool bResult = true;
 
-    return true;
+/*
+    WITH_LOCK(*this) {
+        for(int sectorIndex = 0; sectorIndex < (int)sectorCount; sectorIndex++) {
+            SectorHeader sectorHeader;
+
+            spiFlash->readData(addrStart + sectorIndex * spiFlash->getSectorSize(), &sectorHeader, sizeof(SectorHeader));
+            
+            // sectorMeta[sectorIndex] = sectorHeader.c;
+
+            if (sectorHeader.sectorMagic == SECTOR_MAGIC) {
+
+                if (sectorHeader.c.sequence > lastSequence) {
+                    // lastSequence = sectorHeader.c.sequence;
+                }
+
+                // _log.trace("loading sectorIndex=%d sequence=%d flags=0x%x", sectorIndex, (int)sectorHeader.c.sequence, (int)sectorHeader.c.flags);
+            }
+            else {
+                _log.error("sector %d invalid magic 0x%x", (int)sectorIndex, (int)sectorHeader.sectorMagic);
+                sectorMeta[sectorIndex].flags &= ~SECTOR_FLAG_CORRUPTED_MASK;
+
+                bResult = false;            
+            }
+        }
+
+        
+    }
+*/
+    return bResult;
 }
 
 
