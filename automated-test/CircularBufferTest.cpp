@@ -340,6 +340,50 @@ void testUnitWrap(std::vector<String> &testSet) {
 
 }
 
+void testUsageStats(std::vector<String> &testSet) {
+    const uint16_t sectorCount = 100; // 409,600 bytes
+
+    CircularBufferSpiFlashRK circBuffer(&spiFlash, 0, sectorCount * 4096);
+    circBuffer.format();
+
+    CircularBufferSpiFlashRK::UsageStats stats;
+
+    circBuffer.getUsageStats(stats);
+    assert(stats.dataSize == 0);
+    assert(stats.recordCount == 0);
+
+    int stringCount = testSet.size();
+    int writeIndex = 0;
+    int dataSize = 0;
+    int recordCount = 0;
+
+    for(size_t ii = 0; ii < 4; ii++) {
+        String s = testSet.at(writeIndex++ % stringCount);
+
+        CircularBufferSpiFlashRK::DataBuffer origBuffer(s.c_str());
+        bool bResult =circBuffer.writeData(origBuffer);
+        if (!bResult) {
+            printf("testUsageStats writeData failed ii=%d\n", (int)ii);
+            break;
+        }
+        recordCount++;
+        dataSize += s.length();
+    }
+
+    circBuffer.getUsageStats(stats);
+    if (stats.dataSize != dataSize) {
+        printf("testUsageStats dataSize got=%d exp=%d\n", (int) stats.dataSize, (int) dataSize );
+        assert(false);
+    }
+    if (stats.recordCount != recordCount) {
+        printf("testUsageStats recordCount got=%d exp=%d\n", (int) stats.recordCount, (int) recordCount );
+        assert(false);
+    }
+
+
+
+}
+
 void runUnitTests() {
     // Local unit tests only used off-device 
 
@@ -355,6 +399,8 @@ void runUnitTests() {
 
     
     testUnitWrap(randomString1024);
+
+    testUsageStats(randomStringSmall);
 
 }
 

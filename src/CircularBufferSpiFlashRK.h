@@ -183,6 +183,21 @@ public:
          */
         const uint8_t *getBuffer() const { return buf; };
 
+        /**
+         * @brief Get the length of the data
+         * 
+         * @return size_t 
+         */
+        size_t getLen() const { return len; };
+
+        /**
+         * @brief Set the length to newLen if it's <= the current length (only truncates, does not extend)
+         * 
+         * @param newLen 
+         * 
+         * Doesn't actually release the memory, just sets len.
+         */
+        void truncate(size_t newLen);
 
     protected:
         /**
@@ -406,7 +421,8 @@ public:
          */
         void log(LogLevel level, const char *msg) const;
 
-        
+        size_t recordCount;
+        size_t dataSize;
     };
 
     /**

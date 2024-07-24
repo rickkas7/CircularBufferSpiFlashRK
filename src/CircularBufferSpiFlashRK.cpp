@@ -682,12 +682,57 @@ bool CircularBufferSpiFlashRK::getUsageStats(UsageStats &usageStats) {
     }
 
     WITH_LOCK(*this) {
+        // Calculate the number of events in the queue that are finalized
+        usageStats.recordCount = 0;
+        usageStats.dataSize = 0;
+
+        uint16_t readSectorNum = 0xfff;
+        sequenceToSectorNum(firstSequence, readSectorNum);
+
+
+        for(uint16_t sectorNum = 0; sectorNum < sectorCount; sectorNum++) {
+            if ((sectorMeta[sectorNum].flags & SECTOR_FLAG_FINALIZED_MASK) == 0 && sectorNum != readSectorNum) {
+                // Add all finalized sectors that are not the read sector
+                usageStats.recordCount += sectorMeta[sectorNum].recordCount;
+                usageStats.dataSize += sectorMeta[sectorNum].dataSize;                
+            }
+        }
+
+        Sector *pSector = getSector(readSectorNum);
+        if (pSector) {
+            uint16_t offset = sizeof(SectorHeader);
+            for(auto iter = pSector->records.begin(); iter != pSector->records.end(); iter++) {
+                if ((iter->flags & RECORD_FLAG_READ_MASK) == RECORD_FLAG_READ_MASK) {
+                    // Not marked as read, add to count
+                    usageStats.recordCount += 1;
+                    usageStats.dataSize += iter->size;
+                }
+            }
+        }
+
+        uint16_t writeSectorNum = 0xfff;
+        if (sequenceToSectorNum(writeSequence, writeSectorNum) && readSectorNum != writeSectorNum) {
+            pSector = getSector(writeSectorNum);
+            if (pSector) {
+                uint16_t offset = sizeof(SectorHeader);
+                for(auto iter = pSector->records.begin(); iter != pSector->records.end(); iter++) {
+                    if ((iter->flags & RECORD_FLAG_READ_MASK) == RECORD_FLAG_READ_MASK) {
+                        // Not marked as read, add to count
+                        usageStats.recordCount += 1;
+                        usageStats.dataSize += iter->size;
+                    }
+                }
+            }
+        }
+
+        bResult = true;
     }
+
     return bResult;
 }
 
 void CircularBufferSpiFlashRK::UsageStats::log(LogLevel level, const char *msg) const {
-    _log.log(level, "%s", msg);
+    _log.log(level, "%s recordCount=%d dataSize=%d", msg, (int)recordCount, (int)dataSize);
     
 }
 
@@ -796,6 +841,12 @@ void CircularBufferSpiFlashRK::DataBuffer::copy(const char *str) {
 uint8_t *CircularBufferSpiFlashRK::DataBuffer::allocate(size_t len) {
     copy(nullptr, len);
     return this->buf;
+}
+
+void CircularBufferSpiFlashRK::DataBuffer::truncate(size_t newLen) {
+    if (newLen <= len) {
+        len = newLen;
+    }
 }
 
 
