@@ -203,11 +203,25 @@ public:
         size_t len;
     };
 
+    /**
+     * @brief Data stored in flash for each record in the sector
+     * 
+     * This 2 byte (16 bit) structure is stored packed after the SectorHeader.
+     * If the size is all 1 bits (RECORD_SIZE_ERASED, 0xfff) then this record
+     * has not been written yet. (SPI NOR flash sectors are initialized to all
+     * 1s during sector or chip erase.)
+     */
     struct RecordCommon { // 2 bytes
         unsigned int size : 12; //!< Number of bytes (0 - 4094, though less with overhead)
         unsigned int flags : 4; //!< Flag bits
     } __attribute__((__packed__));
 
+    /**
+     * @brief Data stored after the magic bytes in flash
+     * 
+     * A copy of this is kept in RAM as well, so the library will use 8 bytes of
+     * RAM for each sector.
+     */
     struct SectorCommon { // 8 bytes
         uint32_t sequence; //!< Monotonically increasing sequence number for sector used
         unsigned int flags:4; //!< Various flag bits
@@ -216,17 +230,53 @@ public:
         unsigned int dataSize:12; //!< Number of bytes of data in records, set during finalize
     } __attribute__((__packed__));
 
+    /**
+     * @brief Structure store at the beginning of each sector
+     */
     struct SectorHeader { // 12 bytes
-        uint32_t sectorMagic;
-        SectorCommon c;
+        uint32_t sectorMagic; //!< Magic bytes SECTOR_MAGIC = 0x0ceb6443
+        SectorCommon c; //!< SectorCommon structure (8 bytes)
     } __attribute__((__packed__));
 
+
+    /**
+     * @brief Information about a sector, stored in RAM
+     * 
+     * This class is instantiated and owned by getSector() which manages the object 
+     * lifetime. Do not delete an instance of this class directly.
+     * 
+     * The main reason for this class is that records are packed sequentially
+     * into a sector. In order to access the records efficiently, the Sector
+     * class builds an index in RAM. This requires an SPI read for each record.
+     * 
+     * This is done per-sector, since an index of every sector could be very large.
+     * 
+     * The sector class does not contain the data in the sector, so this class 
+     * is relatively small (not the fully 4096 byte sector).
+     */
     class Sector {
     public:
+        /**
+         * @brief Clear the records vector and common data
+         * 
+         * @param sectorNum 
+         */
         void clear(uint16_t sectorNum = 0);
 
+        /**
+         * @brief Get the offset within the sector after the last record
+         * 
+         * @return uint16_t 
+         */
         uint16_t getLastOffset() const;
 
+        /**
+         * @brief Log information about the sector to _log.
+         * 
+         * @param level The log level, such as LOG_LEVEL_TRACE or LOG_LEVEL_INFO
+         * @param msg A message to insert at the beginning of the log message
+         * @param includeData Not currently used
+         */
         void log(LogLevel level, const char *msg, bool includeData = false) const;
 
         uint16_t sectorNum = 0;
@@ -272,6 +322,12 @@ public:
      */
     class ReadInfo : public DataBuffer {
     public:        
+        /**
+         * @brief 
+         * 
+         * @param level The log level, such as LOG_LEVEL_TRACE or LOG_LEVEL_INFO
+         * @param msg 
+         */
         void log(LogLevel level, const char *msg) const;
         uint16_t sectorNum; //!< sector number that was read from
         SectorCommon sectorCommon; //!< Information about the sector. The sequence is what's used from this currently.
@@ -325,6 +381,12 @@ public:
      */
     class UsageStats {
     public:
+        /**
+         * @brief 
+         * 
+         * @param level The log level, such as LOG_LEVEL_TRACE or LOG_LEVEL_INFO
+         * @param msg 
+         */
         void log(LogLevel level, const char *msg) const;
 
         
