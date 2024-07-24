@@ -216,7 +216,7 @@ public:
         unsigned int dataSize:12; //!< Number of bytes of data in records, set during finalize
     } __attribute__((__packed__));
 
-    struct SectorHeader {
+    struct SectorHeader { // 12 bytes
         uint32_t sectorMagic;
         SectorCommon c;
     } __attribute__((__packed__));

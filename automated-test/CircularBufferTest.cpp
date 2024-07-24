@@ -15,7 +15,7 @@ std::vector<String> randomStringSmall;
 int main(int argc, char *argv[]) {
     spiFlash.begin();
     runUnitTests();
-    // runTestSuite(&spiFlash);
+    runTestSuite(&spiFlash);
     return 0;
 }
 
