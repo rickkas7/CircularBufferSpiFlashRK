@@ -292,8 +292,18 @@ public:
     };
 
 
-
+    /**
+     * @brief Construct a new circular buffer object. This is typically done as a global variable.
+     *
+     * @param spiFlash The SpiFlashRK object for the SPI NOR flash chip.
+     * @param addrStart Address to start at (typically 0). Must be sector aligned (multiple of 4096 bytes).
+     * @param addrEnd Address to end at (not inclusive). Must be sector aligned (multiple of 4096 bytes).
+     */
     CircularBufferSpiFlashRK(SpiFlash *spiFlash, size_t addrStart, size_t addrEnd);
+
+    /**
+     * @brief Destroy the object
+     */
     virtual ~CircularBufferSpiFlashRK();
 
     /**
@@ -521,14 +531,14 @@ protected:
      */
     uint32_t sectorNumToAddr(uint16_t sectorNum) const { return addrStart + sectorNum * spiFlash->getSectorSize(); };
 
-    static const uint32_t SECTOR_MAGIC = 0x0ceb6443;
-    static const uint32_t SECTOR_MAGIC_ERASED = 0xffffffff;
-    static const unsigned int SECTOR_FLAG_STARTED_MASK = 0x01;
-    static const unsigned int SECTOR_FLAG_FINALIZED_MASK = 0x02;
-    static const unsigned int SECTOR_FLAG_CORRUPTED_MASK = 0x04;
+    static const uint32_t SECTOR_MAGIC = 0x0ceb6443; //!< Magic bytes stored at beginning of SectorHeader structure
+    static const uint32_t SECTOR_MAGIC_ERASED = 0xffffffff; //!< Magic bytes value if the sector is erased and not formatted.
+    static const unsigned int SECTOR_FLAG_STARTED_MASK = 0x01; //!< Bit that is cleared when a sector is first written to after formatting
+    static const unsigned int SECTOR_FLAG_FINALIZED_MASK = 0x02; //!< Bit that is cleared when a sector has been fully written to
+    static const unsigned int SECTOR_FLAG_CORRUPTED_MASK = 0x04; //!< Bit that is cleared when a sector has invalid record structures
 
-    static const unsigned int RECORD_SIZE_ERASED = 0xfff;
-    static const unsigned int RECORD_FLAG_READ_MASK = 0x1;
+    static const unsigned int RECORD_SIZE_ERASED = 0xfff; //!< Record size value when there is no record at this location. This is the value of the 12-bit value when the sector is erased.
+    static const unsigned int RECORD_FLAG_READ_MASK = 0x1; //!< Bit that is cleared when a record has been read.
 
     
     /**

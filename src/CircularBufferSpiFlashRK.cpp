@@ -121,36 +121,20 @@ bool CircularBufferSpiFlashRK::format() {
 }
 
 bool CircularBufferSpiFlashRK::fsck(bool repair) {
-    bool bResult = true;
+    bool bResult;
 
-/*
+    // Reload the sector meta data
+    bResult = load();
+
     WITH_LOCK(*this) {
-        for(int sectorIndex = 0; sectorIndex < (int)sectorCount; sectorIndex++) {
-            SectorHeader sectorHeader;
+        // Check if any sectors are marked as corrupted
 
-            spiFlash->readData(addrStart + sectorIndex * spiFlash->getSectorSize(), &sectorHeader, sizeof(SectorHeader));
-            
-            // sectorMeta[sectorIndex] = sectorHeader.c;
+        // Check if sequence numbers are out of order
 
-            if (sectorHeader.sectorMagic == SECTOR_MAGIC) {
-
-                if (sectorHeader.c.sequence > lastSequence) {
-                    // lastSequence = sectorHeader.c.sequence;
-                }
-
-                // _log.trace("loading sectorIndex=%d sequence=%d flags=0x%x", sectorIndex, (int)sectorHeader.c.sequence, (int)sectorHeader.c.flags);
-            }
-            else {
-                _log.error("sector %d invalid magic 0x%x", (int)sectorIndex, (int)sectorHeader.sectorMagic);
-                sectorMeta[sectorIndex].flags &= ~SECTOR_FLAG_CORRUPTED_MASK;
-
-                bResult = false;            
-            }
-        }
-
+        // Read each sector to see if the record structures are valid
         
     }
-*/
+
     return bResult;
 }
 
