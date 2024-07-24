@@ -15,7 +15,11 @@ It can use any portion, divided at a sector boundary, or the entire chip.
 The main advantage of this library is that it does not require a file system, like LittleFS or SPIFFS.
 It takes advantage of the natural circularity of the buffer to wear level across all sectors.
 
-It can store text or binary data, up to the sector size of 4096 bytes minus overhead of 10 bytes. Multiple records can be packed
-into a sector, but records won't span sector boundaries, so certain sizes 
+It can store text or binary data, up to the sector size of 4096 bytes minus overhead of 10 bytes. Multiple 
+records will be packed into a sector, but records won't span sector boundaries, so certain sizes,
+such as exactly 2048 byte records, will be inefficient because they do not efficiently pack into
+sectors.
+
+
 
 

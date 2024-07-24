@@ -120,7 +120,7 @@ bool CircularBufferSpiFlashRK::format() {
     return bResult;
 }
 
-bool CircularBufferSpiFlashRK::fsck() {
+bool CircularBufferSpiFlashRK::fsck(bool repair) {
     bool bResult = true;
 
 /*

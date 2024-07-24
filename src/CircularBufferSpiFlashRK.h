@@ -107,6 +107,9 @@ public:
          * 
          * @param len 
          * @return uint8_t 
+         * 
+         * This method is used internally to allocate space, then read the data from
+         * flash into the buffer.
          */
         uint8_t *allocate(size_t len);
         
@@ -232,6 +235,10 @@ public:
 
     /**
      * @brief Structure store at the beginning of each sector
+     * 
+     * This is separate from SectorCommon since we store information about each
+     * sector in the circular buffer. The magic bytes are necessary in flash but
+     * not in RAM, so not storing it in RAM saves 4 bytes per sector.
      */
     struct SectorHeader { // 12 bytes
         uint32_t sectorMagic; //!< Magic bytes SECTOR_MAGIC = 0x0ceb6443
@@ -279,9 +286,9 @@ public:
          */
         void log(LogLevel level, const char *msg, bool includeData = false) const;
 
-        uint16_t sectorNum = 0;
-        std::vector<RecordCommon> records;
-        SectorCommon c;
+        uint16_t sectorNum = 0; //!< Sector number this object contains
+        std::vector<RecordCommon> records; //!< The RecordCommon structure for each record in this sector
+        SectorCommon c; //!< The SectorCommon structure for this sector
     };
 
 
@@ -292,8 +299,7 @@ public:
     /**
      * @brief Load the metadata for the file system
      * 
-     * @return true 
-     * @return false 
+     * @return true on success or false on failure
      * 
      * You must do this (or format) before using the file system. If this function returns
      * false the format is not valid and you should format it.
@@ -303,8 +309,7 @@ public:
     /**
      * @brief Formats the file system
      * 
-     * @return true 
-     * @return false 
+     * @return true on success or false on failure
      * 
      * This will erase every sector and write an empty file structure to it. This must
      * be done if the file system is invalid or erased.
@@ -312,8 +317,13 @@ public:
     bool format();
 
 
-
-    bool fsck();
+    /**
+     * @brief Perform a file system check. Not currently implemented!
+     * 
+     * @param repair True to attempt to repair a damaged circular buffer.
+     * @return true on success or false on failure
+     */
+    bool fsck(bool repair);
 
     /**
      * @brief Structure used by readData and markAsRead
@@ -339,8 +349,7 @@ public:
      * @brief Read the next unread data from the circular buffer
      * 
      * @param readInfo 
-     * @return true 
-     * @return false 
+     * @return true on success or false on failure
      * 
      * After reading the data, you must pass the same readInfo to markAsRead
      * otherwise you'll read the same data again.
@@ -351,8 +360,7 @@ public:
      * @brief Mark the data from readData as read
      * 
      * @param readInfo 
-     * @return true 
-     * @return false 
+     * @return true on success or false on failure
      * 
      * This method works properly even if the sector was overwritten because the 
      * buffer was full and additional data was written to it. It will ignore the
@@ -364,8 +372,7 @@ public:
      * @brief Write data to the circular buffer
      * 
      * @param data 
-     * @return true 
-     * @return false
+     * @return true on success or false on failure
      * 
      * Data is always written to the buffer. If the circular buffer is full, the oldest
      * sector is deleted to make room for new data.
@@ -396,8 +403,7 @@ public:
      * @brief Get the usage statistics
      * 
      * @param usageStats 
-     * @return true 
-     * @return false 
+     * @return true on success or false on failure
      * 
      * This method isn't const because it needs to obtain a lock on this object.
      */
@@ -440,8 +446,7 @@ protected:
      * 
      * @param sectorNum 
      * @param sector 
-     * @return true 
-     * @return false 
+     * @return true on success or false on failure
      */
     bool readSector(uint16_t sectorNum, Sector *sector);
 
@@ -451,8 +456,7 @@ protected:
      * @param sectorNum 
      * @param erase 
      * @param sequence 
-     * @return true 
-     * @return false 
+     * @return true on success or false on failure
      */
     bool writeSectorHeader(uint16_t sectorNum, bool erase, uint32_t sequence);
 
@@ -462,8 +466,7 @@ protected:
      * @param sector 
      * @param data 
      * @param flags 
-     * @return true 
-     * @return false 
+     * @return true on success or false on failure
      */
     bool appendDataToSector(Sector *sector, const DataBuffer &data, uint16_t flags);
     
@@ -471,8 +474,7 @@ protected:
      * @brief Used internally when a sector is full and a new sector needs to be used. Use writeData() instead!
      * 
      * @param sector 
-     * @return true 
-     * @return false 
+     * @return true on success or false on failure
      */
     bool finalizeSector(Sector *sector);
 
@@ -483,8 +485,7 @@ protected:
      * @param index 
      * @param data 
      * @param meta 
-     * @return true 
-     * @return false 
+     * @return true on success or false on failure
      */
     bool readDataFromSector(Sector *sector, size_t index, DataBuffer &data, RecordCommon &meta);
 
@@ -492,8 +493,7 @@ protected:
      * @brief Used internally to validate as sector. Only used for off-device unit tests.
      * 
      * @param pSector 
-     * @return true 
-     * @return false 
+     * @return true on success or false on failure
      * 
      * This method validates all of the fields in the sector and assures that the data on flash
      * matches the internal cache. It's only used during off-device unit tests, and will assert
@@ -508,8 +508,7 @@ protected:
      * 
      * @param sequence 
      * @param sectorNum 
-     * @return true 
-     * @return false 
+     * @return true on success or false on failure
      */
     bool sequenceToSectorNum(uint32_t sequence, uint16_t &sectorNum) const;
 
@@ -529,12 +528,20 @@ protected:
     static const unsigned int SECTOR_FLAG_CORRUPTED_MASK = 0x04;
 
     static const unsigned int RECORD_SIZE_ERASED = 0xfff;
-    static const unsigned int RECORD_FLAG_READ_MASK = 0x0001;
+    static const unsigned int RECORD_FLAG_READ_MASK = 0x1;
 
-    static const uint32_t UNUSED_MAGIC = 0xa417a966;
-    static const uint32_t UNUSED_MAGIC2 = 0x26793787;
-
-    static const size_t SECTOR_CACHE_SIZE = 10;
+    
+    /**
+     * @brief Number of cached Sector structures used by getSector
+     * 
+     * The Sector structure does not contain the data, so this is not a lot of RAM, but can add up
+     * especially if you are storing small records because there's a vector of RecordCommon structures,
+     * one for each record.
+     * 
+     * The cache exists because indexing a Sector requires n + 2 SPI reads where n is the number 
+     * of records, so this can be a lot of transactions if you have small records.
+     */
+    static const size_t SECTOR_CACHE_SIZE = 8;
 
 public:
 #ifndef UNITTEST
@@ -565,29 +572,20 @@ public:
 #endif // UNITTEST
 
 protected:
-    SpiFlash *spiFlash;
-    size_t addrStart;
-    size_t addrEnd;
+    SpiFlash *spiFlash; //!< The class to access the SPI flash chip
+    size_t addrStart; //!< Address in SPI flash where circular buffer begins, must be sector aligned
+    size_t addrEnd; //!< Address in SPI flash where circular buffer ends, must be sector aligned
     size_t sectorCount; //!< Calculated in constructor, number of sectors from addrStart to addrEnd
 
-    SectorCommon *sectorMeta = nullptr;
+    SectorCommon *sectorMeta = nullptr; //!< Array of SectorCommon structures, one for each sector.
 
-    /*
-    Sector *currentReadSector = nullptr;
-    Sector *currentWriteSector = nullptr;
-    int firstSector = -1;
-    uint32_t firstSectorSequence = 0;
 
-    int lastSector = -1;
-    uint32_t lastSectorSequence = 0;
-    */
+    bool isValid = false; //!< true once load() or format() has been called and is successful
+    std::deque<Sector*> sectorCache; //!< Cache used by getSector()
 
-    bool isValid = false;
-    std::deque<Sector*> sectorCache;
-
-    uint32_t firstSequence = 0;
-    uint32_t writeSequence = 0;
-    uint32_t lastSequence = 0;
+    uint32_t firstSequence = 0; //!< Sequence number of read from
+    uint32_t writeSequence = 0; //!< Sequence number to write to
+    uint32_t lastSequence = 0; //!< Last sequence number used.
 
     /**
      * @brief Mutex to protect shared resources
@@ -595,7 +593,7 @@ protected:
      * This is initialized in setup() so make sure you call the setup() method from the global application setup.
      */
 #ifndef UNITTEST
-    os_mutex_recursive_t mutex = 0;
+    os_mutex_recursive_t mutex = 0; 
 #endif
 
 };
