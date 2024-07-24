@@ -203,10 +203,10 @@ public:
         size_t len;
     };
 
-    struct RecordCommon { // 8 bytes
-        uint16_t size;
-        uint16_t flags;
-    };
+    struct RecordCommon { // 2 bytes
+        unsigned int size : 12; //!< Number of bytes (0 - 4094, though less with overhead)
+        unsigned int flags : 4; //!< Flag bits
+    } __attribute__((__packed__));
 
     struct SectorCommon { // 8 bytes
         uint32_t sequence; //!< Monotonically increasing sequence number for sector used
@@ -214,12 +214,12 @@ public:
         unsigned int reserved:7; //!< Reserved for future use
         unsigned int recordCount:9; //!< Number of records, set during finalize
         unsigned int dataSize:12; //!< Number of bytes of data in records, set during finalize
-    };
+    } __attribute__((__packed__));
 
     struct SectorHeader {
         uint32_t sectorMagic;
         SectorCommon c;
-    };
+    } __attribute__((__packed__));
 
     class Sector {
     public:
@@ -384,7 +384,10 @@ protected:
 
     bool readDataFromSector(Sector *sector, size_t index, DataBuffer &data, RecordCommon &meta);
 
+    bool validateSector(Sector *pSector);
+
     bool sequenceToSectorNum(uint32_t sequence, uint16_t &sectorNum) const;
+
 
     /**
      * @brief Convert a sector number to an address
@@ -396,11 +399,12 @@ protected:
 
     static const uint32_t SECTOR_MAGIC = 0x0ceb6443;
     static const uint32_t SECTOR_MAGIC_ERASED = 0xffffffff;
-    static const uint32_t SECTOR_FLAG_STARTED_MASK = 0x01;
-    static const uint32_t SECTOR_FLAG_FINALIZED_MASK = 0x02;
-    static const uint32_t SECTOR_FLAG_CORRUPTED_MASK = 0x04;
+    static const unsigned int SECTOR_FLAG_STARTED_MASK = 0x01;
+    static const unsigned int SECTOR_FLAG_FINALIZED_MASK = 0x02;
+    static const unsigned int SECTOR_FLAG_CORRUPTED_MASK = 0x04;
 
-    static const uint16_t RECORD_FLAG_READ_MASK = 0x0001;
+    static const unsigned int RECORD_SIZE_ERASED = 0xfff;
+    static const unsigned int RECORD_FLAG_READ_MASK = 0x0001;
 
     static const uint32_t UNUSED_MAGIC = 0xa417a966;
     static const uint32_t UNUSED_MAGIC2 = 0x26793787;
