@@ -435,19 +435,82 @@ protected:
      */
     Sector *getSector(uint16_t sectorNum);
 
-
+    /**
+     * @brief Used internally to read the data from SPI flash. Use getSector() instead!
+     * 
+     * @param sectorNum 
+     * @param sector 
+     * @return true 
+     * @return false 
+     */
     bool readSector(uint16_t sectorNum, Sector *sector);
 
+    /**
+     * @brief Used internally to write a sector header. Use writeData() instead!
+     * 
+     * @param sectorNum 
+     * @param erase 
+     * @param sequence 
+     * @return true 
+     * @return false 
+     */
     bool writeSectorHeader(uint16_t sectorNum, bool erase, uint32_t sequence);
 
+    /**
+     * @brief Used internally to append data to an existing sector. Use writeData() instead!
+     * 
+     * @param sector 
+     * @param data 
+     * @param flags 
+     * @return true 
+     * @return false 
+     */
     bool appendDataToSector(Sector *sector, const DataBuffer &data, uint16_t flags);
-
+    
+    /**
+     * @brief Used internally when a sector is full and a new sector needs to be used. Use writeData() instead!
+     * 
+     * @param sector 
+     * @return true 
+     * @return false 
+     */
     bool finalizeSector(Sector *sector);
 
+    /**
+     * @brief Used internally to read a record from a sector. Use readData() instead!
+     * 
+     * @param sector 
+     * @param index 
+     * @param data 
+     * @param meta 
+     * @return true 
+     * @return false 
+     */
     bool readDataFromSector(Sector *sector, size_t index, DataBuffer &data, RecordCommon &meta);
 
+    /**
+     * @brief Used internally to validate as sector. Only used for off-device unit tests.
+     * 
+     * @param pSector 
+     * @return true 
+     * @return false 
+     * 
+     * This method validates all of the fields in the sector and assures that the data on flash
+     * matches the internal cache. It's only used during off-device unit tests, and will assert
+     * if the sector is not valid.
+     * 
+     * On-device it just always returns true.
+     */
     bool validateSector(Sector *pSector);
 
+    /**
+     * @brief Used internally to find a sector number for a sequence number
+     * 
+     * @param sequence 
+     * @param sectorNum 
+     * @return true 
+     * @return false 
+     */
     bool sequenceToSectorNum(uint32_t sequence, uint16_t &sectorNum) const;
 
 

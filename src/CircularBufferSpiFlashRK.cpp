@@ -2,6 +2,12 @@
 
 static Logger _log("app.circ");
 
+#ifdef UNITTEST
+#define FATAL_ASSERT(x) do { assert(false); } while(0)
+#else
+#define FATAL_ASSERT(x)
+#endif
+
 CircularBufferSpiFlashRK::CircularBufferSpiFlashRK(SpiFlash *spiFlash, size_t addrStart, size_t addrEnd) :
     spiFlash(spiFlash), addrStart(addrStart), addrEnd(addrEnd) {
 
@@ -24,6 +30,7 @@ CircularBufferSpiFlashRK::CircularBufferSpiFlashRK(SpiFlash *spiFlash, size_t ad
     sectorMeta = new SectorCommon[sectorCount];
     if (!sectorMeta) {
         _log.error("could not allocate sectorMeta sectorCount=%d", (int)sectorCount);
+        FATAL_ASSERT(); // Only used for off-device unit tests
     }
 
 }
@@ -47,6 +54,7 @@ bool CircularBufferSpiFlashRK::load() {
 
         if (!sectorMeta) {
             _log.error("sectorMeta not allocated");
+            FATAL_ASSERT(); // Only used for off-device unit tests
             return false;
         }
 
@@ -78,6 +86,7 @@ bool CircularBufferSpiFlashRK::load() {
                 _log.error("sector %d invalid magic 0x%x", (int)sectorIndex, (int)sectorHeader.sectorMagic);
                 sectorMeta[sectorIndex].flags &= ~SECTOR_FLAG_CORRUPTED_MASK;
 
+                FATAL_ASSERT(); // Only used for off-device unit tests
                 bResult = false;            
             }
         }
@@ -181,6 +190,7 @@ CircularBufferSpiFlashRK::Sector *CircularBufferSpiFlashRK::getSector(uint16_t s
         }
         else {
             _log.error("getSector could not allocate");
+            FATAL_ASSERT(); // Only used for off-device unit tests
         }        
     }
 
@@ -245,7 +255,8 @@ bool CircularBufferSpiFlashRK::readSector(uint16_t sectorNum, Sector *sector) {
         if (corruptedError) {
             sectorMeta[sectorNum].flags &= ~SECTOR_FLAG_CORRUPTED_MASK;
             sector->c = sectorMeta[sectorNum];
-            _log.error("%s corrupted %s sectorNum=%d offset=%d size=%d (0x%x)", "readSector", corruptedError, (int)sectorNum, (int)offset, (int)recordCommon.size, (int)recordCommon.size);
+            _log.error("%s corrupted %s sectorNum=%d offset=%d size=%d (0x%x)", "readSector", corruptedError, (int)sectorNum, (int)offset, (int)recordCommon.size, (int)recordCommon.size);            
+            FATAL_ASSERT(); // Only used for off-device unit tests
             return false;
         }
 
@@ -300,6 +311,7 @@ bool CircularBufferSpiFlashRK::appendDataToSector(Sector *pSector, const DataBuf
 
     if (!isValid) {
         _log.error("%s not isValid", "appendDataToSector");
+        FATAL_ASSERT(); // Only used for off-device unit tests
         return false;
     }
 
@@ -335,6 +347,7 @@ bool CircularBufferSpiFlashRK::appendDataToSector(Sector *pSector, const DataBuf
 bool CircularBufferSpiFlashRK::finalizeSector(Sector *pSector) {
     if (!isValid) {
         _log.error("%s not isValid", "finalizeSector");
+        FATAL_ASSERT(); // Only used for off-device unit tests
         return false;
     }
 
@@ -360,6 +373,7 @@ bool CircularBufferSpiFlashRK::finalizeSector(Sector *pSector) {
 bool CircularBufferSpiFlashRK::readDataFromSector(Sector *pSector, size_t index, DataBuffer &data, RecordCommon &meta) {
     if (!isValid) {
         _log.error("%s not isValid", "readDataFromSector");
+        FATAL_ASSERT(); // Only used for off-device unit tests
         return false;
     }
 
@@ -510,18 +524,21 @@ bool CircularBufferSpiFlashRK::readData(ReadInfo &readInfo) {
 
     if (!isValid) {
         _log.error("%s not isValid", "readData");
+        FATAL_ASSERT(); // Only used for off-device unit tests
         return false;
     }
 
     WITH_LOCK(*this) {
         if (!sequenceToSectorNum(firstSequence, readInfo.sectorNum)) {
             _log.error("%s firstSequence %d not found", "readData", (int)firstSequence);
+            FATAL_ASSERT(); // Only used for off-device unit tests
             return false;
         }
 
         Sector *pSector = getSector(readInfo.sectorNum);
         if (!pSector) {
             _log.error("%s getSector %d failed", "readData", (int)readInfo.sectorNum);
+            FATAL_ASSERT(); // Only used for off-device unit tests
             return false;
         }
 
@@ -563,6 +580,7 @@ bool CircularBufferSpiFlashRK::markAsRead(const ReadInfo &readInfo) {
         Sector *pSector = getSector(readInfo.sectorNum);
         if (!pSector) {
             _log.error("%s sector %d could not be read", "markAsRead", (int)readInfo.sectorNum);
+            FATAL_ASSERT(); // Only used for off-device unit tests
             return false;
         }
 
@@ -610,6 +628,7 @@ bool CircularBufferSpiFlashRK::writeData(const DataBuffer &data) {
     bool bResult = false;
     if (!isValid) {
         _log.error("%s not isValid", "writeData");
+        FATAL_ASSERT(); // Only used for off-device unit tests
         return false;
     }
 
@@ -618,12 +637,14 @@ bool CircularBufferSpiFlashRK::writeData(const DataBuffer &data) {
         uint16_t sectorNum;
         if (!sequenceToSectorNum(writeSequence, sectorNum)) {
             _log.error("%s writeSequence %d not found", "writeData", (int)writeSequence);
+            FATAL_ASSERT(); // Only used for off-device unit tests
             return false;
         }
        
         Sector *pSector = getSector(sectorNum);
         if (!pSector) {
             _log.error("%s getSector %d failed", "writeData", (int)sectorNum);
+            FATAL_ASSERT(); // Only used for off-device unit tests
             return false;
         }
 
@@ -640,6 +661,7 @@ bool CircularBufferSpiFlashRK::writeData(const DataBuffer &data) {
 
             pSector = getSector(sectorNum);
             if (!pSector) {
+                FATAL_ASSERT(); // Only used for off-device unit tests
                 return false;
             }
 
@@ -671,6 +693,7 @@ bool CircularBufferSpiFlashRK::getUsageStats(UsageStats &usageStats) {
     bool bResult = false;
     if (!isValid) {
         _log.error("%s not isValid", "writeData");
+        FATAL_ASSERT(); // Only used for off-device unit tests
         return false;
     }
 
