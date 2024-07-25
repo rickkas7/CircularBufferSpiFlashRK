@@ -29,3 +29,9 @@ sectors.
 
 One use case of this library is [PublishQueueSpiFlashRK](https://github.com/rickkas7/PublishQueueSpiFlashRK)
 which uses the circular buffer to store events when offline.
+
+## Version history
+
+### 0.0.1 (2024-07-26)
+
+Initial version.

@@ -82,7 +82,11 @@ String makeRandomString(size_t maxLen) {
 }
 
 void test02(SpiFlash *spiFlash) {
+#ifdef UNITTEST
     size_t testCount = 1000;
+#else
+    size_t testCount = 10000;
+#endif
     size_t maxLen = 128;
     size_t subTestSize = 20;
 
@@ -96,9 +100,11 @@ void test02(SpiFlash *spiFlash) {
     int stringsTested = 0;
 
     for(size_t testNum = 0; testNum < testCount; testNum++) {
+#ifndef UNITTEST
         if ((testNum % 25) == 0) {
-            Log.trace("test2 %d of %d", (int)testNum, (int)testCount);
+            Log.trace("test2 %d of %d freeMem=%d", (int)testNum, (int)testCount, (int)System.freeMemory());
         }
+#endif
         int numToWrite = rand() % subTestSize;
         for(int ii = 0; ii < numToWrite; ii++) {
             String s = makeRandomString(maxLen);
@@ -133,6 +139,12 @@ void test02(SpiFlash *spiFlash) {
             }
         }
     }
+
+    // Validate that completed buffer can be loaded again
+    if (!circBuffer.load()) {
+        Log.error("test2 could not reload");        
+    }
+
     Log.info("test2 complete stringsTested=%d", stringsTested);
 }
 

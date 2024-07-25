@@ -811,11 +811,8 @@ CircularBufferSpiFlashRK::DataBuffer::DataBuffer() : buf(nullptr), len(0) {
 
 }
 
-CircularBufferSpiFlashRK::DataBuffer::~DataBuffer() {
-    if (buf) {
-        delete[] buf;
-        buf = nullptr;
-    }
+CircularBufferSpiFlashRK::DataBuffer::~DataBuffer() {    
+    free();
 }
 
 CircularBufferSpiFlashRK::DataBuffer::DataBuffer(const void *buf, size_t len) {
