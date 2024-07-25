@@ -367,7 +367,7 @@ void testUsageStats(std::vector<String> &testSet) {
             break;
         }
         recordCount++;
-        dataSize += s.length();
+        dataSize += s.length() + 1;
     }
 
     circBuffer.getUsageStats(stats);
@@ -380,7 +380,37 @@ void testUsageStats(std::vector<String> &testSet) {
         assert(false);
     }
 
+    
+    CircularBufferSpiFlashRK::ReadInfo readInfo;
+    assert(circBuffer.readData(readInfo));
+    assert(circBuffer.markAsRead(readInfo));
 
+    dataSize -= readInfo.getLen();
+    recordCount--;
+
+    circBuffer.getUsageStats(stats);
+    if (stats.dataSize != dataSize) {
+        printf("testUsageStats dataSize got=%d exp=%d\n", (int) stats.dataSize, (int) dataSize );
+        assert(false);
+    }
+    if (stats.recordCount != recordCount) {
+        printf("testUsageStats recordCount got=%d exp=%d\n", (int) stats.recordCount, (int) recordCount );
+        assert(false);
+    }
+
+    while(true) {
+        CircularBufferSpiFlashRK::ReadInfo readInfo;
+        bool bResult = circBuffer.readData(readInfo);
+        if (!bResult) {
+            break;
+        }
+
+        assert(circBuffer.markAsRead(readInfo));
+    }
+
+    circBuffer.getUsageStats(stats);
+    assert(stats.dataSize == 0);
+    assert(stats.recordCount == 0);
 
 }
 
