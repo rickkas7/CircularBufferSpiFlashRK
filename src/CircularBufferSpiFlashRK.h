@@ -421,8 +421,9 @@ public:
          */
         void log(LogLevel level, const char *msg) const;
 
-        size_t recordCount;
-        size_t dataSize;
+        size_t recordCount; //!< Number of records in the circular buffer
+        size_t dataSize; //!< Number of bytes used for data in the circular buffer (does not include overhead)
+        size_t freeSectors; //!< Number of sectors free (includes partially filled sectors)
     };
 
     /**

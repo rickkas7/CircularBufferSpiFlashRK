@@ -685,16 +685,22 @@ bool CircularBufferSpiFlashRK::getUsageStats(UsageStats &usageStats) {
         // Calculate the number of events in the queue that are finalized
         usageStats.recordCount = 0;
         usageStats.dataSize = 0;
+        usageStats.freeSectors = 0;
 
         uint16_t readSectorNum = 0xfff;
         sequenceToSectorNum(firstSequence, readSectorNum);
 
 
         for(uint16_t sectorNum = 0; sectorNum < sectorCount; sectorNum++) {
-            if ((sectorMeta[sectorNum].flags & SECTOR_FLAG_FINALIZED_MASK) == 0 && sectorNum != readSectorNum) {
-                // Add all finalized sectors that are not the read sector
-                usageStats.recordCount += sectorMeta[sectorNum].recordCount;
-                usageStats.dataSize += sectorMeta[sectorNum].dataSize;                
+            if ((sectorMeta[sectorNum].flags & SECTOR_FLAG_FINALIZED_MASK) == 0) {
+                if (sectorNum != readSectorNum) {
+                    // Add all finalized sectors that are not the read sector
+                    usageStats.recordCount += sectorMeta[sectorNum].recordCount;
+                    usageStats.dataSize += sectorMeta[sectorNum].dataSize;                
+                }
+            } 
+            else {
+                usageStats.freeSectors++;
             }
         }
 
@@ -740,7 +746,7 @@ void CircularBufferSpiFlashRK::clearCache() {
 }
 
 void CircularBufferSpiFlashRK::UsageStats::log(LogLevel level, const char *msg) const {
-    _log.log(level, "%s recordCount=%d dataSize=%d", msg, (int)recordCount, (int)dataSize);
+    _log.log(level, "%s recordCount=%d dataSize=%d freeSectors=%d", msg, (int)recordCount, (int)dataSize, (int)freeSectors);
     
 }
 

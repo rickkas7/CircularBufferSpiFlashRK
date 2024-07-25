@@ -351,13 +351,17 @@ void testUsageStats(std::vector<String> &testSet) {
     circBuffer.getUsageStats(stats);
     assert(stats.dataSize == 0);
     assert(stats.recordCount == 0);
+    if (stats.freeSectors != sectorCount) {
+        printf("testUsageStats freeSectors got=%d exp=%d\n", (int) stats.freeSectors, (int) sectorCount );
+        assert(false);
+    }
 
     int stringCount = testSet.size();
     int writeIndex = 0;
     int dataSize = 0;
     int recordCount = 0;
 
-    for(size_t ii = 0; ii < 4; ii++) {
+    for(size_t ii = 0; ii < 250; ii++) {
         String s = testSet.at(writeIndex++ % stringCount);
 
         CircularBufferSpiFlashRK::DataBuffer origBuffer(s.c_str());
@@ -377,6 +381,11 @@ void testUsageStats(std::vector<String> &testSet) {
     }
     if (stats.recordCount != recordCount) {
         printf("testUsageStats recordCount got=%d exp=%d\n", (int) stats.recordCount, (int) recordCount );
+        assert(false);
+    }
+    stats.log(LOG_LEVEL_TRACE, "stats");
+    if (stats.freeSectors == sectorCount) {
+        printf("testUsageStats freeSectors got=%d expected not=%d\n", (int) stats.freeSectors, (int) sectorCount );
         assert(false);
     }
 

@@ -27,6 +27,5 @@ records will be packed into a sector, but records won't span sector boundaries, 
 such as exactly 2048 byte records, will be inefficient because they do not efficiently pack into
 sectors.
 
-
-
-
+One use case of this library is [PublishQueueSpiFlashRK](https://github.com/rickkas7/PublishQueueSpiFlashRK)
+which uses the circular buffer to store events when offline.
