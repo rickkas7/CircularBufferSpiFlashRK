@@ -547,6 +547,11 @@ protected:
      */
     uint32_t sectorNumToAddr(uint16_t sectorNum) const { return addrStart + sectorNum * spiFlash->getSectorSize(); };
 
+    /**
+     * @brief Remove entries from the sector cache
+     */
+    void clearCache();
+
     static const uint32_t SECTOR_MAGIC = 0x0ceb6443; //!< Magic bytes stored at beginning of SectorHeader structure
     static const uint32_t SECTOR_MAGIC_ERASED = 0xffffffff; //!< Magic bytes value if the sector is erased and not formatted.
     static const unsigned int SECTOR_FLAG_STARTED_MASK = 0x01; //!< Bit that is cleared when a sector is first written to after formatting

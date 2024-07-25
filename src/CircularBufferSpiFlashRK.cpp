@@ -36,10 +36,8 @@ CircularBufferSpiFlashRK::CircularBufferSpiFlashRK(SpiFlash *spiFlash, size_t ad
 }
 
 CircularBufferSpiFlashRK::~CircularBufferSpiFlashRK() {
-    while(!sectorCache.empty()) {
-        delete sectorCache.back();
-        sectorCache.pop_back();
-    }
+    clearCache();
+
 #ifndef UNITTEST
     os_mutex_recursive_destroy(&mutex);
 #endif
@@ -48,6 +46,8 @@ CircularBufferSpiFlashRK::~CircularBufferSpiFlashRK() {
 
 bool CircularBufferSpiFlashRK::load() {
     bool bResult = true;
+
+    clearCache();
 
     WITH_LOCK(*this) {
         isValid = false;
@@ -729,6 +729,14 @@ bool CircularBufferSpiFlashRK::getUsageStats(UsageStats &usageStats) {
     }
 
     return bResult;
+}
+
+
+void CircularBufferSpiFlashRK::clearCache() {
+    while(!sectorCache.empty()) {
+        delete sectorCache.back();
+        sectorCache.pop_back();
+    }
 }
 
 void CircularBufferSpiFlashRK::UsageStats::log(LogLevel level, const char *msg) const {
