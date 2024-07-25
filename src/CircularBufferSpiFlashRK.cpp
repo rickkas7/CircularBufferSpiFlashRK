@@ -38,6 +38,11 @@ CircularBufferSpiFlashRK::CircularBufferSpiFlashRK(SpiFlash *spiFlash, size_t ad
 CircularBufferSpiFlashRK::~CircularBufferSpiFlashRK() {
     clearCache();
 
+    if (sectorMeta) {
+        delete[] sectorMeta;
+        sectorMeta = nullptr;
+    }
+
 #ifndef UNITTEST
     os_mutex_recursive_destroy(&mutex);
 #endif

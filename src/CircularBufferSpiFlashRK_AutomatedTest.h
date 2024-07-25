@@ -103,6 +103,9 @@ void test02(SpiFlash *spiFlash) {
 #ifndef UNITTEST
         if ((testNum % 25) == 0) {
             Log.trace("test2 %d of %d freeMem=%d", (int)testNum, (int)testCount, (int)System.freeMemory());
+            CircularBufferSpiFlashRK::UsageStats stats;
+            circBuffer.getUsageStats(stats);
+            stats.log(LOG_LEVEL_TRACE, "test2");
         }
 #endif
         int numToWrite = rand() % subTestSize;
@@ -115,8 +118,20 @@ void test02(SpiFlash *spiFlash) {
         }
 
 
-        // Read more than we write on average to avoid infinitely growing
-        int numToRead = rand() % (2 * subTestSize);
+        int numToRead;
+
+        CircularBufferSpiFlashRK::UsageStats stats;
+        circBuffer.getUsageStats(stats);
+
+        if ((rand() % 4) == 0) {
+            // Don't read everything 1/4 of the time
+            numToRead = rand() % stats.recordCount;
+        }
+        else {
+            // Otherwise read everything
+            numToRead = stats.recordCount;
+        }
+
         for(int ii = 0; ii < numToRead; ii++) {
             CircularBufferSpiFlashRK::ReadInfo readInfo;
             if (circBuffer.readData(readInfo)) {
@@ -133,9 +148,6 @@ void test02(SpiFlash *spiFlash) {
                     return;
                 }
                 stringsTested++;
-            }
-            else {
-                break;
             }
         }
     }
