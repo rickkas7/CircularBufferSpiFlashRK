@@ -230,7 +230,8 @@ void testUnitSectorAppend(std::vector<String> &testSet) {
         }
     }
 
-
+    // Validate that completed buffer can be loaded again
+    assert(circBuffer.load());
 
 
 }
@@ -278,6 +279,10 @@ void testUnitReadWrite(std::vector<String> &testSet) {
             }
         }
     }
+
+    // Validate that completed buffer can be loaded again
+    assert(circBuffer.load());
+
 }
 
 void testUnitWrap(std::vector<String> &testSet) {
@@ -337,6 +342,10 @@ void testUnitWrap(std::vector<String> &testSet) {
 
         circBuffer.markAsRead(readInfo);
     }
+
+    // Validate that completed buffer can be loaded again
+    assert(circBuffer.load());
+
 
 }
 

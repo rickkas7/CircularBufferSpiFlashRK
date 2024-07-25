@@ -15,7 +15,7 @@ It can use any portion, divided at a sector boundary, or the entire chip.
 It limited to 16-bit sector numbers within the circular buffer, so the maximum size circular buffer is 
 256 Mbyte but the chip can be larger than that.
 
-A chip can contain multiple separate buffers if desired by instantiating multiple CircularBuffer SpiFlashRK
+A chip can contain multiple separate buffers if desired by instantiating multiple CircularBufferSpiFlashRK
 objects sharing a single SpiFlash object. You can also use other portions of the flash for other purposes as 
 long as the other uses properly lock the SPI bus or access it using the shared SpiFlash object.
 

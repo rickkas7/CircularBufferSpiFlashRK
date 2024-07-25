@@ -45,7 +45,6 @@ CircularBufferSpiFlashRK::~CircularBufferSpiFlashRK() {
 }
 
 bool CircularBufferSpiFlashRK::load() {
-    bool bResult = true;
 
     clearCache();
 
@@ -61,6 +60,9 @@ bool CircularBufferSpiFlashRK::load() {
         firstSequence = writeSequence = 0xffffffff;
         lastSequence = 0;
 
+        int firstSequenceSectorIndex = 0;
+        isValid = true;
+
         for(int sectorIndex = 0; sectorIndex < (int)sectorCount; sectorIndex++) {
             SectorHeader sectorHeader;
 
@@ -70,6 +72,7 @@ bool CircularBufferSpiFlashRK::load() {
             if (sectorHeader.sectorMagic == SECTOR_MAGIC) {
                 if (sectorHeader.c.sequence < firstSequence) {
                     firstSequence = sectorHeader.c.sequence;
+                    firstSequenceSectorIndex = sectorIndex;
                 }
                 if (sectorHeader.c.sequence > lastSequence) {
                     lastSequence = sectorHeader.c.sequence;
@@ -87,18 +90,31 @@ bool CircularBufferSpiFlashRK::load() {
                 sectorMeta[sectorIndex].flags &= ~SECTOR_FLAG_CORRUPTED_MASK;
 
                 FATAL_ASSERT(); // Only used for off-device unit tests
-                bResult = false;            
+                isValid = false;            
             }
         }
 
-        isValid = true;
+        if (isValid) {
+            // Check that sequence numbers are sequential
+            uint32_t expectedSequence = firstSequence;
+            for(int sectorIndex = firstSequenceSectorIndex; sectorIndex < (firstSequenceSectorIndex + (int)sectorCount); sectorIndex++) {
+                // sectorIndex may be > sectorCount in this loop due to wrapping!
+                int sequence = sectorMeta[sectorIndex % sectorCount].sequence;
+                if (sequence != expectedSequence) {
+                    _log.trace("sector %d bad sequence got=%d expected=%d", (int)(sectorIndex % sectorCount), (int)sequence, (int)expectedSequence);
+                    FATAL_ASSERT(); // Only used for off-device unit tests
+                    isValid = false;
+                    break;
+                }
+                expectedSequence++;
+            }
+        }
 
-        // TODO: Check that sequence numbers are reasonable
 
         _log.trace("firstSequence=%d writeSequence=%d lastSequence=%d", (int)firstSequence, (int)writeSequence, (int)lastSequence);
     }
 
-    return bResult;
+    return isValid;
 }
 
 
