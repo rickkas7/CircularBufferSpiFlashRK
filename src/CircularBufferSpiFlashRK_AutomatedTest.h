@@ -124,6 +124,7 @@ void test02(SpiFlash *spiFlash) {
         }
         if (stats.recordCount > 500) {
             Log.error("test2 testNum=%d records are growing uncontrollably", (int)testNum);
+            stats.log(LOG_LEVEL_INFO, "test2");
             break;
         }
 

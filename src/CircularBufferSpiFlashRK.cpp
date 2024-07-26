@@ -534,40 +534,59 @@ bool CircularBufferSpiFlashRK::readData(ReadInfo &readInfo) {
     }
 
     WITH_LOCK(*this) {
-        if (!sequenceToSectorNum(firstSequence, readInfo.sectorNum)) {
-            _log.error("%s firstSequence %d not found", "readData", (int)firstSequence);
-            FATAL_ASSERT(); // Only used for off-device unit tests
-            return false;
-        }
+        for(int tries = 0; tries < 4; tries++) {
+            if (!sequenceToSectorNum(firstSequence, readInfo.sectorNum)) {
+                _log.error("%s firstSequence %d not found", "readData", (int)firstSequence);
+                FATAL_ASSERT(); // Only used for off-device unit tests
+                return false;
+            }
 
-        Sector *pSector = getSector(readInfo.sectorNum);
-        if (!pSector) {
-            _log.error("%s getSector %d failed", "readData", (int)readInfo.sectorNum);
-            FATAL_ASSERT(); // Only used for off-device unit tests
-            return false;
-        }
+            Sector *pSector = getSector(readInfo.sectorNum);
+            if (!pSector) {
+                _log.error("%s getSector %d failed", "readData", (int)readInfo.sectorNum);
+                FATAL_ASSERT(); // Only used for off-device unit tests
+                return false;
+            }
 
-        readInfo.sectorCommon = pSector->c;
+            readInfo.sectorCommon = pSector->c;
 
-        size_t addr = sectorNumToAddr(readInfo.sectorNum);
+            size_t addr = sectorNumToAddr(readInfo.sectorNum);
 
-        readInfo.index = 0;
+            readInfo.index = 0;
 
-        uint16_t offset = sizeof(SectorHeader);
-        for(auto iter = pSector->records.begin(); iter != pSector->records.end(); iter++, readInfo.index++) {
-            if ((iter->flags & RECORD_FLAG_READ_MASK) == RECORD_FLAG_READ_MASK) {
-                // Not marked as read
-                uint8_t *dataBuf = readInfo.allocate(iter->size);
-                spiFlash->readData(addr + offset + sizeof(RecordCommon), dataBuf, readInfo.size());
+            uint16_t offset = sizeof(SectorHeader);
+            for(auto iter = pSector->records.begin(); iter != pSector->records.end(); iter++, readInfo.index++) {
+                if ((iter->flags & RECORD_FLAG_READ_MASK) == RECORD_FLAG_READ_MASK) {
+                    // Not marked as read
+                    uint8_t *dataBuf = readInfo.allocate(iter->size);
+                    spiFlash->readData(addr + offset + sizeof(RecordCommon), dataBuf, readInfo.size());
 
-                readInfo.recordCommon = *iter;
-                bResult = true;
+                    readInfo.recordCommon = *iter;
+                    bResult = true;
+                    break;
+                }
+                offset += sizeof(RecordCommon) + iter->size;
+            }
+            if (bResult) {
+                // Have data
                 break;
             }
-            offset += sizeof(RecordCommon) + iter->size;
+
+            if ((pSector->c.flags & SECTOR_FLAG_FINALIZED_MASK) != 0) {
+                // No data yet and not finalized, wait for more
+                // _log.trace("%s not finalized in sector %d sequence=%d flags=0x%x firstSequence=%d writeSequence=%d", "readData", (int)readInfo.sectorNum, (int)pSector->c.sequence, (int)pSector->c.flags, (int)firstSequence, (int)writeSequence);        
+                break;
+            }
+
+            //_log.trace("%s called with no unread data in sector %d sequence=%d flags=0x%x firstSequence=%d writeSequence=%d", "readData", (int)readInfo.sectorNum, (int)pSector->c.sequence, (int)pSector->c.flags, (int)firstSequence, (int)writeSequence);        
+            //pSector->log(LOG_LEVEL_TRACE, "no data?");
+
+
+            firstSequence++;
+            writeSectorHeader(readInfo.sectorNum, true /* erase */, ++lastSequence);
+            //_log.trace("%s clearing finalized sector %d with no data, new empty seq %d", "readData", (int)readInfo.sectorNum, (int)lastSequence);            
         }
 
-        // _log.trace("%s called with no unread data in sector %d", "readData", (int)readInfo.sectorNum);
     }
 
     return bResult;
