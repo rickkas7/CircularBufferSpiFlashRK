@@ -534,40 +534,56 @@ bool CircularBufferSpiFlashRK::readData(ReadInfo &readInfo) {
     }
 
     WITH_LOCK(*this) {
-        if (!sequenceToSectorNum(firstSequence, readInfo.sectorNum)) {
-            _log.error("%s firstSequence %d not found", "readData", (int)firstSequence);
-            FATAL_ASSERT(); // Only used for off-device unit tests
-            return false;
-        }
+        for(int tries = 0; tries < 4; tries++) {
+            if (!sequenceToSectorNum(firstSequence, readInfo.sectorNum)) {
+                _log.error("%s firstSequence %d not found", "readData", (int)firstSequence);
+                FATAL_ASSERT(); // Only used for off-device unit tests
+                return false;
+            }
 
-        Sector *pSector = getSector(readInfo.sectorNum);
-        if (!pSector) {
-            _log.error("%s getSector %d failed", "readData", (int)readInfo.sectorNum);
-            FATAL_ASSERT(); // Only used for off-device unit tests
-            return false;
-        }
+            Sector *pSector = getSector(readInfo.sectorNum);
+            if (!pSector) {
+                _log.error("%s getSector %d failed", "readData", (int)readInfo.sectorNum);
+                FATAL_ASSERT(); // Only used for off-device unit tests
+                return false;
+            }
 
-        readInfo.sectorCommon = pSector->c;
+            readInfo.sectorCommon = pSector->c;
 
-        size_t addr = sectorNumToAddr(readInfo.sectorNum);
+            size_t addr = sectorNumToAddr(readInfo.sectorNum);
 
-        readInfo.index = 0;
+            readInfo.index = 0;
 
-        uint16_t offset = sizeof(SectorHeader);
-        for(auto iter = pSector->records.begin(); iter != pSector->records.end(); iter++, readInfo.index++) {
-            if ((iter->flags & RECORD_FLAG_READ_MASK) == RECORD_FLAG_READ_MASK) {
-                // Not marked as read
-                uint8_t *dataBuf = readInfo.allocate(iter->size);
-                spiFlash->readData(addr + offset + sizeof(RecordCommon), dataBuf, readInfo.size());
 
-                readInfo.recordCommon = *iter;
-                bResult = true;
+            if (pSector->records.size() == 0) {
+                _log.trace("%s called with empty sector %d", "readData", (int)readInfo.sectorNum);
                 break;
             }
-            offset += sizeof(RecordCommon) + iter->size;
+
+            uint16_t offset = sizeof(SectorHeader);
+            for(auto iter = pSector->records.begin(); iter != pSector->records.end(); iter++, readInfo.index++) {
+                if ((iter->flags & RECORD_FLAG_READ_MASK) == RECORD_FLAG_READ_MASK) {
+                    // Not marked as read
+                    uint8_t *dataBuf = readInfo.allocate(iter->size);
+                    spiFlash->readData(addr + offset + sizeof(RecordCommon), dataBuf, readInfo.size());
+
+                    readInfo.recordCommon = *iter;
+                    bResult = true;
+                    break;
+                }
+                offset += sizeof(RecordCommon) + iter->size;
+            }
+
+            _log.trace("%s called with no unread data in sector %d", "readData", (int)readInfo.sectorNum);
+
+            // There are records, just no unread
+            if (firstSequence < lastSequence) {
+                // Move to the next sector
+                firstSequence++;
+                _log.trace("%s advancing to next sector %d", (int)firstSequence);
+            }
         }
 
-        // _log.trace("%s called with no unread data in sector %d", "readData", (int)readInfo.sectorNum);
     }
 
     return bResult;

@@ -82,11 +82,7 @@ String makeRandomString(size_t maxLen) {
 }
 
 void test02(SpiFlash *spiFlash) {
-#ifdef UNITTEST
-    size_t testCount = 1000;
-#else
     size_t testCount = 10000;
-#endif
     size_t maxLen = 128;
     size_t subTestSize = 20;
 
@@ -148,6 +144,9 @@ void test02(SpiFlash *spiFlash) {
                     return;
                 }
                 stringsTested++;
+            }
+            else {
+                break;
             }
         }
     }
