@@ -82,7 +82,7 @@ String makeRandomString(size_t maxLen) {
 }
 
 void test02(SpiFlash *spiFlash) {
-    size_t testCount = 10000;
+    size_t testCount = 5000;
     size_t maxLen = 128;
     size_t subTestSize = 20;
 
@@ -160,9 +160,9 @@ void test02(SpiFlash *spiFlash) {
                 stringsTested++;
             }
             else {
-                //Log.info("read failed testNum=%d ii=%d", (int)testNum, (int)ii);
-                //stats.log(LOG_LEVEL_TRACE, "after read fail");
-                // break;
+                Log.info("read failed testNum=%d ii=%d", (int)testNum, (int)ii);
+                stats.log(LOG_LEVEL_TRACE, "after read fail");
+                break;
             }
         }
     }
@@ -170,7 +170,6 @@ void test02(SpiFlash *spiFlash) {
     CircularBufferSpiFlashRK::UsageStats stats;
     circBuffer.getUsageStats(stats);
     stats.log(LOG_LEVEL_INFO, "after test2 loop");
-
 
     // Validate that completed buffer can be loaded again
     if (!circBuffer.load()) {

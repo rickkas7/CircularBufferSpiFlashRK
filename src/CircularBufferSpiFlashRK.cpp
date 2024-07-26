@@ -100,6 +100,13 @@ bool CircularBufferSpiFlashRK::load() {
         }
 
         if (isValid) {
+            if (firstSequence > lastSequence || writeSequence < firstSequence || writeSequence > lastSequence) {
+                _log.error("invalid sequence numbers firstSequence=%d writeSequence=%d lastSequence=%d", (int)firstSequence, (int)writeSequence, (int)lastSequence);
+                isValid = false;
+            }
+        }
+
+        if (isValid) {
             // Check that sequence numbers are sequential
             uint32_t expectedSequence = firstSequence;
             for(int sectorIndex = firstSequenceSectorIndex; sectorIndex < (firstSequenceSectorIndex + (int)sectorCount); sectorIndex++) {
