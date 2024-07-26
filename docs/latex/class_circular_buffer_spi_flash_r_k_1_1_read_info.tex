@@ -1,0 +1,113 @@
+\doxysection{Circular\+Buffer\+Spi\+Flash\+RK\+::Read\+Info Class Reference}
+\hypertarget{class_circular_buffer_spi_flash_r_k_1_1_read_info}{}\label{class_circular_buffer_spi_flash_r_k_1_1_read_info}\index{CircularBufferSpiFlashRK::ReadInfo@{CircularBufferSpiFlashRK::ReadInfo}}
+
+
+Structure used by read\+Data and mark\+As\+Read.  
+
+
+
+
+{\ttfamily \#include $<$Circular\+Buffer\+Spi\+Flash\+RK.\+h$>$}
+
+Inheritance diagram for Circular\+Buffer\+Spi\+Flash\+RK\+::Read\+Info\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_circular_buffer_spi_flash_r_k_1_1_read_info}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_read_info_a6f5af81d090ca4acdc668d928a144ab1}{log}} (Log\+Level level, const char \texorpdfstring{$\ast$}{*}msg) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Data\+Buffer} ()
+\begin{DoxyCompactList}\small\item\em Construct an empty buffer. \end{DoxyCompactList}\item 
+virtual {\bfseries \texorpdfstring{$\sim$}{\string~}\+Data\+Buffer} ()
+\begin{DoxyCompactList}\small\item\em Destroy object. Frees the allocated buffer. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1ca781afec33c735f1f08d99aebd5fcd}{Data\+Buffer}} (const void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a666dd9b01a0e42774b85be8509ed600c}{buf}}, size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3acd81b28e45c730016deae6ef2d5b5b}{len}})
+\begin{DoxyCompactList}\small\item\em Construct a data buffer with a copy of the data by pointer and length. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a27e24479d11da6be86862af48ace669b}{Data\+Buffer}} (const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&other)
+\begin{DoxyCompactList}\small\item\em Construct an object that\textquotesingle{}s a copy of another object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \& \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a45809b396a06096a17c9400381e1001c}{operator=}} (const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&other)
+\begin{DoxyCompactList}\small\item\em Set this object with a copy of another. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_aa342a3007ec33db84c6ff9ea7906a8d0}{Data\+Buffer}} (const char \texorpdfstring{$\ast$}{*}str)
+\begin{DoxyCompactList}\small\item\em Construct a new object from a c-\/string. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a4d0c9b12f90cac8de0a39a4b5c03cc0d}{size}} () const
+\begin{DoxyCompactList}\small\item\em Returns the size of the allocated buffer. \end{DoxyCompactList}\item 
+void {\bfseries free} ()
+\begin{DoxyCompactList}\small\item\em Frees the allocate buffer and sets the length to 0. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a72e73f24ab6c18526f2bb2762ba92ee2}{copy}} (const void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a666dd9b01a0e42774b85be8509ed600c}{buf}}, size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3acd81b28e45c730016deae6ef2d5b5b}{len}})
+\begin{DoxyCompactList}\small\item\em Copies the data in buf and len into an allocated buffer in this object. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a9e5c35348333a0cd90e017bbfa4f4035}{copy}} (const char \texorpdfstring{$\ast$}{*}str)
+\begin{DoxyCompactList}\small\item\em Copies the c-\/string str. \end{DoxyCompactList}\item 
+uint8\+\_\+t \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a908184f831aa128601733dca2bc55b82}{allocate}} (size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3acd81b28e45c730016deae6ef2d5b5b}{len}})
+\begin{DoxyCompactList}\small\item\em Allocate a buffer of the specified length but do not write the data. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3bd8411b56c15e00e6fbafbfb4bf3c01}{operator==}} (const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&other) const
+\begin{DoxyCompactList}\small\item\em Returns true if size and bytes are the same as another object. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_acbb7993a6e1e880c72ae82189f8d7dee}{equals}} (const char \texorpdfstring{$\ast$}{*}str) const
+\begin{DoxyCompactList}\small\item\em Returns true of the strings are equal. \end{DoxyCompactList}\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a18493df360febe932a3d5c24d0e85861}{c\+\_\+str}} () const
+\begin{DoxyCompactList}\small\item\em Returns a pointer to the internal string. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_adaf3ec9e0ec2dcf2741b217e0f68df79}{operator const char \texorpdfstring{$\ast$}{*}}} () const
+\begin{DoxyCompactList}\small\item\em Returns a pointer to the internal string. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a668bb04738b6fca52ca64bb21eb25678}{get\+By\+Index}} (size\+\_\+t index) const
+\begin{DoxyCompactList}\small\item\em Get a byte by index from the internal buffer. \end{DoxyCompactList}\item 
+const uint8\+\_\+t \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a9f8ff64191aededf56be13ba7aaaac44}{get\+Buffer}} () const
+\begin{DoxyCompactList}\small\item\em Returns a pointer to the internal buffer. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_abc828399b293cf19a7091926333fbe12}{get\+Len}} () const
+\begin{DoxyCompactList}\small\item\em Get the length of the data. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a300226a4369dde7e77ddd0e3e32de4d0}{truncate}} (size\+\_\+t new\+Len)
+\begin{DoxyCompactList}\small\item\em Set the length to new\+Len if it\textquotesingle{}s \texorpdfstring{$<$}{<}= the current length (only truncates, does not extend) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_read_info_a8d34af5375662c4ed944a6a45bb1b8a0}\label{class_circular_buffer_spi_flash_r_k_1_1_read_info_a8d34af5375662c4ed944a6a45bb1b8a0} 
+uint16\+\_\+t {\bfseries sector\+Num}
+\begin{DoxyCompactList}\small\item\em sector number that was read from \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_read_info_a72725064216f2ca7aeb574eba676b9ce}\label{class_circular_buffer_spi_flash_r_k_1_1_read_info_a72725064216f2ca7aeb574eba676b9ce} 
+\mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_sector_common}{Sector\+Common}} {\bfseries sector\+Common}
+\begin{DoxyCompactList}\small\item\em Information about the sector. The sequence is what\textquotesingle{}s used from this currently. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_read_info_aef1c347ee4018910ad653497600cef88}\label{class_circular_buffer_spi_flash_r_k_1_1_read_info_aef1c347ee4018910ad653497600cef88} 
+size\+\_\+t {\bfseries index}
+\begin{DoxyCompactList}\small\item\em The record index that was read. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_read_info_a67370e03328340ecaadb2523c5a92fc6}\label{class_circular_buffer_spi_flash_r_k_1_1_read_info_a67370e03328340ecaadb2523c5a92fc6} 
+\mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_record_common}{Record\+Common}} {\bfseries record\+Common}
+\begin{DoxyCompactList}\small\item\em Information about the record that was read. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer}}}
+\begin{DoxyCompactItemize}
+\item 
+uint8\+\_\+t \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a666dd9b01a0e42774b85be8509ed600c}{buf}}
+\begin{DoxyCompactList}\small\item\em Internal allocated buffer. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3acd81b28e45c730016deae6ef2d5b5b}{len}}
+\begin{DoxyCompactList}\small\item\em Length of the data in buf. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Structure used by read\+Data and mark\+As\+Read. 
+
+This class is derived from \doxylink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer} so it its methods can be used to access the data from read\+Data 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_read_info_a6f5af81d090ca4acdc668d928a144ab1}\label{class_circular_buffer_spi_flash_r_k_1_1_read_info_a6f5af81d090ca4acdc668d928a144ab1} 
+\index{CircularBufferSpiFlashRK::ReadInfo@{CircularBufferSpiFlashRK::ReadInfo}!log@{log}}
+\index{log@{log}!CircularBufferSpiFlashRK::ReadInfo@{CircularBufferSpiFlashRK::ReadInfo}}
+\doxysubsubsection{\texorpdfstring{log()}{log()}}
+{\footnotesize\ttfamily void Circular\+Buffer\+Spi\+Flash\+RK\+::\+Read\+Info\+::log (\begin{DoxyParamCaption}\item[{Log\+Level}]{level,  }\item[{const char \texorpdfstring{$\ast$}{*}}]{msg }\end{DoxyParamCaption}) const}
+
+
+\begin{DoxyParams}{Parameters}
+{\em level} & The log level, such as LOG\+\_\+\+LEVEL\+\_\+\+TRACE or LOG\+\_\+\+LEVEL\+\_\+\+INFO \\
+\hline
+{\em msg} & \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/Circular\+Buffer\+Spi\+Flash\+RK.\+h\item 
+src/Circular\+Buffer\+Spi\+Flash\+RK.\+cpp\end{DoxyCompactItemize}

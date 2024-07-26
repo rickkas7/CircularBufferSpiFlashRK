@@ -1,0 +1,368 @@
+\doxysection{Circular\+Buffer\+Spi\+Flash\+RK\+::Data\+Buffer Class Reference}
+\hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+
+
+Class to hold a copy of data, either by pointer and length or a c-\/string.  
+
+
+
+
+{\ttfamily \#include $<$Circular\+Buffer\+Spi\+Flash\+RK.\+h$>$}
+
+Inheritance diagram for Circular\+Buffer\+Spi\+Flash\+RK\+::Data\+Buffer\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_ad356a26846fb7d91906ddcc05a74f2a7}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_ad356a26846fb7d91906ddcc05a74f2a7} 
+{\bfseries Data\+Buffer} ()
+\begin{DoxyCompactList}\small\item\em Construct an empty buffer. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_abbad4728a3b8f6fc97f2ab038790099e}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_abbad4728a3b8f6fc97f2ab038790099e} 
+virtual {\bfseries \texorpdfstring{$\sim$}{\string~}\+Data\+Buffer} ()
+\begin{DoxyCompactList}\small\item\em Destroy object. Frees the allocated buffer. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1ca781afec33c735f1f08d99aebd5fcd}{Data\+Buffer}} (const void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a666dd9b01a0e42774b85be8509ed600c}{buf}}, size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3acd81b28e45c730016deae6ef2d5b5b}{len}})
+\begin{DoxyCompactList}\small\item\em Construct a data buffer with a copy of the data by pointer and length. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a27e24479d11da6be86862af48ace669b}{Data\+Buffer}} (const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&other)
+\begin{DoxyCompactList}\small\item\em Construct an object that\textquotesingle{}s a copy of another object. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \& \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a45809b396a06096a17c9400381e1001c}{operator=}} (const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&other)
+\begin{DoxyCompactList}\small\item\em Set this object with a copy of another. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_aa342a3007ec33db84c6ff9ea7906a8d0}{Data\+Buffer}} (const char \texorpdfstring{$\ast$}{*}str)
+\begin{DoxyCompactList}\small\item\em Construct a new object from a c-\/string. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a4d0c9b12f90cac8de0a39a4b5c03cc0d}{size}} () const
+\begin{DoxyCompactList}\small\item\em Returns the size of the allocated buffer. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1bea8c5a150abf60f63da0e0a066b74b}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1bea8c5a150abf60f63da0e0a066b74b} 
+void {\bfseries free} ()
+\begin{DoxyCompactList}\small\item\em Frees the allocate buffer and sets the length to 0. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a72e73f24ab6c18526f2bb2762ba92ee2}{copy}} (const void \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a666dd9b01a0e42774b85be8509ed600c}{buf}}, size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3acd81b28e45c730016deae6ef2d5b5b}{len}})
+\begin{DoxyCompactList}\small\item\em Copies the data in buf and len into an allocated buffer in this object. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a9e5c35348333a0cd90e017bbfa4f4035}{copy}} (const char \texorpdfstring{$\ast$}{*}str)
+\begin{DoxyCompactList}\small\item\em Copies the c-\/string str. \end{DoxyCompactList}\item 
+uint8\+\_\+t \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a908184f831aa128601733dca2bc55b82}{allocate}} (size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3acd81b28e45c730016deae6ef2d5b5b}{len}})
+\begin{DoxyCompactList}\small\item\em Allocate a buffer of the specified length but do not write the data. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3bd8411b56c15e00e6fbafbfb4bf3c01}{operator==}} (const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&other) const
+\begin{DoxyCompactList}\small\item\em Returns true if size and bytes are the same as another object. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_acbb7993a6e1e880c72ae82189f8d7dee}{equals}} (const char \texorpdfstring{$\ast$}{*}str) const
+\begin{DoxyCompactList}\small\item\em Returns true of the strings are equal. \end{DoxyCompactList}\item 
+const char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a18493df360febe932a3d5c24d0e85861}{c\+\_\+str}} () const
+\begin{DoxyCompactList}\small\item\em Returns a pointer to the internal string. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_adaf3ec9e0ec2dcf2741b217e0f68df79}{operator const char \texorpdfstring{$\ast$}{*}}} () const
+\begin{DoxyCompactList}\small\item\em Returns a pointer to the internal string. \end{DoxyCompactList}\item 
+uint8\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a668bb04738b6fca52ca64bb21eb25678}{get\+By\+Index}} (size\+\_\+t index) const
+\begin{DoxyCompactList}\small\item\em Get a byte by index from the internal buffer. \end{DoxyCompactList}\item 
+const uint8\+\_\+t \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a9f8ff64191aededf56be13ba7aaaac44}{get\+Buffer}} () const
+\begin{DoxyCompactList}\small\item\em Returns a pointer to the internal buffer. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_abc828399b293cf19a7091926333fbe12}{get\+Len}} () const
+\begin{DoxyCompactList}\small\item\em Get the length of the data. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a300226a4369dde7e77ddd0e3e32de4d0}{truncate}} (size\+\_\+t new\+Len)
+\begin{DoxyCompactList}\small\item\em Set the length to new\+Len if it\textquotesingle{}s \texorpdfstring{$<$}{<}= the current length (only truncates, does not extend) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+uint8\+\_\+t \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a666dd9b01a0e42774b85be8509ed600c}{buf}}
+\begin{DoxyCompactList}\small\item\em Internal allocated buffer. \end{DoxyCompactList}\item 
+size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3acd81b28e45c730016deae6ef2d5b5b}{len}}
+\begin{DoxyCompactList}\small\item\em Length of the data in buf. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class to hold a copy of data, either by pointer and length or a c-\/string. 
+
+Uses a buffer allocated by new internally. When storing c-\/strings internally, the null is included in the buffer for efficiently using \doxylink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a18493df360febe932a3d5c24d0e85861}{c\+\_\+str()} and operator const char \texorpdfstring{$\ast$}{*}(). 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1ca781afec33c735f1f08d99aebd5fcd}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1ca781afec33c735f1f08d99aebd5fcd} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!DataBuffer@{DataBuffer}}
+\index{DataBuffer@{DataBuffer}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{DataBuffer()}{DataBuffer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::\+Data\+Buffer (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{buf,  }\item[{size\+\_\+t}]{len }\end{DoxyParamCaption})}
+
+
+
+Construct a data buffer with a copy of the data by pointer and length. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buf} & Pointer to a data. If null, essentially just does \doxylink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1bea8c5a150abf60f63da0e0a066b74b}{free()}. \\
+\hline
+{\em len} & Length of data. If 0, essentially just does \doxylink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1bea8c5a150abf60f63da0e0a066b74b}{free()}. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a27e24479d11da6be86862af48ace669b}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a27e24479d11da6be86862af48ace669b} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!DataBuffer@{DataBuffer}}
+\index{DataBuffer@{DataBuffer}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{DataBuffer()}{DataBuffer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::\+Data\+Buffer (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&}]{other }\end{DoxyParamCaption})}
+
+
+
+Construct an object that\textquotesingle{}s a copy of another object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & \\
+\hline
+\end{DoxyParams}
+The objects will have different allocated pointers, so changes to one will not affect the other. \Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_aa342a3007ec33db84c6ff9ea7906a8d0}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_aa342a3007ec33db84c6ff9ea7906a8d0} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!DataBuffer@{DataBuffer}}
+\index{DataBuffer@{DataBuffer}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{DataBuffer()}{DataBuffer()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::\+Data\+Buffer (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str }\end{DoxyParamCaption})}
+
+
+
+Construct a new object from a c-\/string. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & String to copy. If null, essentially just calls \doxylink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1bea8c5a150abf60f63da0e0a066b74b}{free()} on this object.\\
+\hline
+\end{DoxyParams}
+The str value is copied, so it does not need to remain valid after this call returns. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a908184f831aa128601733dca2bc55b82}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a908184f831aa128601733dca2bc55b82} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!allocate@{allocate}}
+\index{allocate@{allocate}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{allocate()}{allocate()}}
+{\footnotesize\ttfamily uint8\+\_\+t \texorpdfstring{$\ast$}{*} Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::allocate (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{len }\end{DoxyParamCaption})}
+
+
+
+Allocate a buffer of the specified length but do not write the data. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em len} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint8\+\_\+t
+\end{DoxyReturn}
+This method is used internally to allocate space, then read the data from flash into the buffer. \Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a18493df360febe932a3d5c24d0e85861}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a18493df360febe932a3d5c24d0e85861} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!c\_str@{c\_str}}
+\index{c\_str@{c\_str}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{c\_str()}{c\_str()}}
+{\footnotesize\ttfamily const char \texorpdfstring{$\ast$}{*} Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::c\+\_\+str (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+Returns a pointer to the internal string. 
+
+\begin{DoxyReturn}{Returns}
+const char\texorpdfstring{$\ast$}{*} A valid c-\/string
+\end{DoxyReturn}
+This always returns a valid c-\/string, even if this buffer is freed or not a c-\/string. If this object is not a valid c-\/string, returns a pointer to a static null value.
+
+The returned string will not be valid after this object is modified as a new buffer is typically allocated instead of modifying the buffer in place! \Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a9e5c35348333a0cd90e017bbfa4f4035}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a9e5c35348333a0cd90e017bbfa4f4035} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!copy@{copy}}
+\index{copy@{copy}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{copy()}{copy()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::copy (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str }\end{DoxyParamCaption})}
+
+
+
+Copies the c-\/string str. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & A c-\/string to copy. If null, essentially just does \doxylink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1bea8c5a150abf60f63da0e0a066b74b}{free()}\\
+\hline
+\end{DoxyParams}
+The internal buffer includes the null terminator so \doxylink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a18493df360febe932a3d5c24d0e85861}{c\+\_\+str()} is efficient. \Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a72e73f24ab6c18526f2bb2762ba92ee2}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a72e73f24ab6c18526f2bb2762ba92ee2} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!copy@{copy}}
+\index{copy@{copy}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{copy()}{copy()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::copy (\begin{DoxyParamCaption}\item[{const void \texorpdfstring{$\ast$}{*}}]{buf,  }\item[{size\+\_\+t}]{len }\end{DoxyParamCaption})}
+
+
+
+Copies the data in buf and len into an allocated buffer in this object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buf} & Pointer to a data. If null, essentially just does \doxylink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1bea8c5a150abf60f63da0e0a066b74b}{free()}. \\
+\hline
+{\em len} & Length of data. If 0, essentially just does \doxylink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1bea8c5a150abf60f63da0e0a066b74b}{free()}. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_acbb7993a6e1e880c72ae82189f8d7dee}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_acbb7993a6e1e880c72ae82189f8d7dee} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!equals@{equals}}
+\index{equals@{equals}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{equals()}{equals()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::equals (\begin{DoxyParamCaption}\item[{const char \texorpdfstring{$\ast$}{*}}]{str }\end{DoxyParamCaption}) const}
+
+
+
+Returns true of the strings are equal. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em str} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true 
+
+false
+\end{DoxyReturn}
+Returns true only if this object has a buffer allocated, it\textquotesingle{}s a c-\/string, and lengths are the same, and the bytes are the same. In all other cases false is returned. \Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a9f8ff64191aededf56be13ba7aaaac44}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a9f8ff64191aededf56be13ba7aaaac44} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!getBuffer@{getBuffer}}
+\index{getBuffer@{getBuffer}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{getBuffer()}{getBuffer()}}
+{\footnotesize\ttfamily const uint8\+\_\+t \texorpdfstring{$\ast$}{*} Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::get\+Buffer (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns a pointer to the internal buffer. 
+
+\begin{DoxyReturn}{Returns}
+const uint8\+\_\+t\texorpdfstring{$\ast$}{*} Pointer to buffer, or nullptr 
+\end{DoxyReturn}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a668bb04738b6fca52ca64bb21eb25678}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a668bb04738b6fca52ca64bb21eb25678} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!getByIndex@{getByIndex}}
+\index{getByIndex@{getByIndex}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{getByIndex()}{getByIndex()}}
+{\footnotesize\ttfamily uint8\+\_\+t Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::get\+By\+Index (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{index }\end{DoxyParamCaption}) const}
+
+
+
+Get a byte by index from the internal buffer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index} & 0 = first byte of buffer \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint8\+\_\+t Return 0 if buffer or index is invalid 
+\end{DoxyReturn}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_abc828399b293cf19a7091926333fbe12}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_abc828399b293cf19a7091926333fbe12} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!getLen@{getLen}}
+\index{getLen@{getLen}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{getLen()}{getLen()}}
+{\footnotesize\ttfamily size\+\_\+t Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::get\+Len (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get the length of the data. 
+
+\begin{DoxyReturn}{Returns}
+size\+\_\+t 
+\end{DoxyReturn}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_adaf3ec9e0ec2dcf2741b217e0f68df79}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_adaf3ec9e0ec2dcf2741b217e0f68df79} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!operator const char \texorpdfstring{$\ast$}{*}@{operator const char \texorpdfstring{$\ast$}{*}}}
+\index{operator const char \texorpdfstring{$\ast$}{*}@{operator const char \texorpdfstring{$\ast$}{*}}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{operator const char \texorpdfstring{$\ast$}{*}()}{operator const char *()}}
+{\footnotesize\ttfamily Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::operator const char \texorpdfstring{$\ast$}{*} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns a pointer to the internal string. 
+
+\begin{DoxyReturn}{Returns}
+const char\texorpdfstring{$\ast$}{*} A valid c-\/string
+\end{DoxyReturn}
+This always returns a valid c-\/string, even if this buffer is freed or not a c-\/string. If this object is not a valid c-\/string, returns a pointer to a static null value.
+
+The returned string will not be valid after this object is modified as a new buffer is typically allocated instead of modifying the buffer in place! \Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a45809b396a06096a17c9400381e1001c}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a45809b396a06096a17c9400381e1001c} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!operator=@{operator=}}
+\index{operator=@{operator=}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer}} \& Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&}]{other }\end{DoxyParamCaption})}
+
+
+
+Set this object with a copy of another. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & \\
+\hline
+\end{DoxyParams}
+The objects will have different allocated pointers, so changes to one will not affect the other. \Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3bd8411b56c15e00e6fbafbfb4bf3c01}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3bd8411b56c15e00e6fbafbfb4bf3c01} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!operator==@{operator==}}
+\index{operator==@{operator==}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&}]{other }\end{DoxyParamCaption}) const}
+
+
+
+Returns true if size and bytes are the same as another object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true 
+
+false
+\end{DoxyReturn}
+Returns true only if both objects are allocated, the same length, and have the same byte values. Returns false in all other cases. \Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a4d0c9b12f90cac8de0a39a4b5c03cc0d}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a4d0c9b12f90cac8de0a39a4b5c03cc0d} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!size@{size}}
+\index{size@{size}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily size\+\_\+t Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns the size of the allocated buffer. 
+
+\begin{DoxyReturn}{Returns}
+size\+\_\+t
+\end{DoxyReturn}
+For c-\/strings, the size includes the trailing null, so this will be exactly 1 larger than strlen(). In other words, an empty c-\/string has a size() of 1. \Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a300226a4369dde7e77ddd0e3e32de4d0}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a300226a4369dde7e77ddd0e3e32de4d0} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!truncate@{truncate}}
+\index{truncate@{truncate}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{truncate()}{truncate()}}
+{\footnotesize\ttfamily void Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::truncate (\begin{DoxyParamCaption}\item[{size\+\_\+t}]{new\+Len }\end{DoxyParamCaption})}
+
+
+
+Set the length to new\+Len if it\textquotesingle{}s \texorpdfstring{$<$}{<}= the current length (only truncates, does not extend) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em new\+Len} & \\
+\hline
+\end{DoxyParams}
+Doesn\textquotesingle{}t actually release the memory, just sets len. 
+
+\doxysubsection{Field Documentation}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a666dd9b01a0e42774b85be8509ed600c}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a666dd9b01a0e42774b85be8509ed600c} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!buf@{buf}}
+\index{buf@{buf}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{buf}{buf}}
+{\footnotesize\ttfamily uint8\+\_\+t\texorpdfstring{$\ast$}{*} Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::buf\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Internal allocated buffer. 
+
+It\textquotesingle{}s allocated mostly by \doxylink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a72e73f24ab6c18526f2bb2762ba92ee2}{copy()}.
+
+It\textquotesingle{}s freed by \doxylink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1bea8c5a150abf60f63da0e0a066b74b}{free()}. The destructor calls \doxylink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a1bea8c5a150abf60f63da0e0a066b74b}{free()}.
+
+It\textquotesingle{}s nullptr when not allocated. \Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3acd81b28e45c730016deae6ef2d5b5b}\label{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a3acd81b28e45c730016deae6ef2d5b5b} 
+\index{CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}!len@{len}}
+\index{len@{len}!CircularBufferSpiFlashRK::DataBuffer@{CircularBufferSpiFlashRK::DataBuffer}}
+\doxysubsubsection{\texorpdfstring{len}{len}}
+{\footnotesize\ttfamily size\+\_\+t Circular\+Buffer\+Spi\+Flash\+RK\+::\+Data\+Buffer\+::len\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Length of the data in buf. 
+
+The length includes the trailing null for c-\/strings.
+
+If length is 0, buf is not allocated and will be nullptr. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/Circular\+Buffer\+Spi\+Flash\+RK.\+h\item 
+src/Circular\+Buffer\+Spi\+Flash\+RK.\+cpp\end{DoxyCompactItemize}

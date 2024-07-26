@@ -1,0 +1,30 @@
+\doxysection{Circular\+Buffer\+Spi\+Flash\+RK\+::Record\+Common Struct Reference}
+\hypertarget{struct_circular_buffer_spi_flash_r_k_1_1_record_common}{}\label{struct_circular_buffer_spi_flash_r_k_1_1_record_common}\index{CircularBufferSpiFlashRK::RecordCommon@{CircularBufferSpiFlashRK::RecordCommon}}
+
+
+Data stored in flash for each record in the sector.  
+
+
+
+
+{\ttfamily \#include $<$Circular\+Buffer\+Spi\+Flash\+RK.\+h$>$}
+
+\doxysubsubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{struct_circular_buffer_spi_flash_r_k_1_1_record_common_a5939069d28e86afbab0bfe08275f594d}\label{struct_circular_buffer_spi_flash_r_k_1_1_record_common_a5939069d28e86afbab0bfe08275f594d} 
+unsigned int {\bfseries size}\+: 12
+\begin{DoxyCompactList}\small\item\em Number of bytes (0 -\/ 4094, though less with overhead) \end{DoxyCompactList}\item 
+\Hypertarget{struct_circular_buffer_spi_flash_r_k_1_1_record_common_a377f92bae6b4ee097c9ea69d7f67fff1}\label{struct_circular_buffer_spi_flash_r_k_1_1_record_common_a377f92bae6b4ee097c9ea69d7f67fff1} 
+unsigned int {\bfseries flags}\+: 4
+\begin{DoxyCompactList}\small\item\em Flag bits. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Data stored in flash for each record in the sector. 
+
+This 2 byte (16 bit) structure is stored packed after the \doxylink{struct_circular_buffer_spi_flash_r_k_1_1_sector_header}{Sector\+Header}. If the size is all 1 bits (RECORD\+\_\+\+SIZE\+\_\+\+ERASED, 0xfff) then this record has not been written yet. (SPI NOR flash sectors are initialized to all 1s during sector or chip erase.) 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/Circular\+Buffer\+Spi\+Flash\+RK.\+h\end{DoxyCompactItemize}

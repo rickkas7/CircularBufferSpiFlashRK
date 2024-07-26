@@ -1,0 +1,30 @@
+\doxysection{Circular\+Buffer\+Spi\+Flash\+RK\+::Sector\+Header Struct Reference}
+\hypertarget{struct_circular_buffer_spi_flash_r_k_1_1_sector_header}{}\label{struct_circular_buffer_spi_flash_r_k_1_1_sector_header}\index{CircularBufferSpiFlashRK::SectorHeader@{CircularBufferSpiFlashRK::SectorHeader}}
+
+
+Structure store at the beginning of each sector.  
+
+
+
+
+{\ttfamily \#include $<$Circular\+Buffer\+Spi\+Flash\+RK.\+h$>$}
+
+\doxysubsubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{struct_circular_buffer_spi_flash_r_k_1_1_sector_header_adf38302a4c99afdffdd9d046059d8edc}\label{struct_circular_buffer_spi_flash_r_k_1_1_sector_header_adf38302a4c99afdffdd9d046059d8edc} 
+uint32\+\_\+t {\bfseries sector\+Magic}
+\begin{DoxyCompactList}\small\item\em Magic bytes SECTOR\+\_\+\+MAGIC = 0x0ceb6443. \end{DoxyCompactList}\item 
+\Hypertarget{struct_circular_buffer_spi_flash_r_k_1_1_sector_header_aaaf6a1958bafafacdf9cb317941a4b74}\label{struct_circular_buffer_spi_flash_r_k_1_1_sector_header_aaaf6a1958bafafacdf9cb317941a4b74} 
+\mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_sector_common}{Sector\+Common}} {\bfseries c}
+\begin{DoxyCompactList}\small\item\em \doxylink{struct_circular_buffer_spi_flash_r_k_1_1_sector_common}{Sector\+Common} structure (8 bytes) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Structure store at the beginning of each sector. 
+
+This is separate from \doxylink{struct_circular_buffer_spi_flash_r_k_1_1_sector_common}{Sector\+Common} since we store information about each sector in the circular buffer. The magic bytes are necessary in flash but not in RAM, so not storing it in RAM saves 4 bytes per sector. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/Circular\+Buffer\+Spi\+Flash\+RK.\+h\end{DoxyCompactItemize}

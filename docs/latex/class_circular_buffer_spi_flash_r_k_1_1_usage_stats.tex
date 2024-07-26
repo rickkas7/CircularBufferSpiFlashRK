@@ -1,0 +1,53 @@
+\doxysection{Circular\+Buffer\+Spi\+Flash\+RK\+::Usage\+Stats Class Reference}
+\hypertarget{class_circular_buffer_spi_flash_r_k_1_1_usage_stats}{}\label{class_circular_buffer_spi_flash_r_k_1_1_usage_stats}\index{CircularBufferSpiFlashRK::UsageStats@{CircularBufferSpiFlashRK::UsageStats}}
+
+
+Class for various stats about the circular buffer usage.  
+
+
+
+
+{\ttfamily \#include $<$Circular\+Buffer\+Spi\+Flash\+RK.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_afa453adb1ffa0016791fd8cca762b157}{log}} (Log\+Level level, const char \texorpdfstring{$\ast$}{*}msg) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_a6dee8a23647a526e5087b7343e02d8ac}\label{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_a6dee8a23647a526e5087b7343e02d8ac} 
+size\+\_\+t {\bfseries record\+Count}
+\begin{DoxyCompactList}\small\item\em Number of records in the circular buffer. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_a91441e74e250db923b69b73dc9c4ab76}\label{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_a91441e74e250db923b69b73dc9c4ab76} 
+size\+\_\+t {\bfseries data\+Size}
+\begin{DoxyCompactList}\small\item\em Number of bytes used for data in the circular buffer (does not include overhead) \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_aece6764b26a46189661758ac38276603}\label{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_aece6764b26a46189661758ac38276603} 
+size\+\_\+t {\bfseries free\+Sectors}
+\begin{DoxyCompactList}\small\item\em Number of sectors free (includes partially filled sectors) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Class for various stats about the circular buffer usage. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_afa453adb1ffa0016791fd8cca762b157}\label{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_afa453adb1ffa0016791fd8cca762b157} 
+\index{CircularBufferSpiFlashRK::UsageStats@{CircularBufferSpiFlashRK::UsageStats}!log@{log}}
+\index{log@{log}!CircularBufferSpiFlashRK::UsageStats@{CircularBufferSpiFlashRK::UsageStats}}
+\doxysubsubsection{\texorpdfstring{log()}{log()}}
+{\footnotesize\ttfamily void Circular\+Buffer\+Spi\+Flash\+RK\+::\+Usage\+Stats\+::log (\begin{DoxyParamCaption}\item[{Log\+Level}]{level,  }\item[{const char \texorpdfstring{$\ast$}{*}}]{msg }\end{DoxyParamCaption}) const}
+
+
+\begin{DoxyParams}{Parameters}
+{\em level} & The log level, such as LOG\+\_\+\+LEVEL\+\_\+\+TRACE or LOG\+\_\+\+LEVEL\+\_\+\+INFO \\
+\hline
+{\em msg} & \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/Circular\+Buffer\+Spi\+Flash\+RK.\+h\item 
+src/Circular\+Buffer\+Spi\+Flash\+RK.\+cpp\end{DoxyCompactItemize}
