@@ -119,6 +119,11 @@ void test02(SpiFlash *spiFlash) {
         CircularBufferSpiFlashRK::UsageStats stats;
         circBuffer.getUsageStats(stats);
 
+        if (stats.recordCount == 0) {
+            // This can happen if number of random writes was 0
+            continue;
+        }
+
         if ((rand() % 4) == 0) {
             // Don't read everything 1/4 of the time
             numToRead = rand() % stats.recordCount;
