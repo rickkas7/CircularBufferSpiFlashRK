@@ -1,0 +1,199 @@
+\doxysection{Circular\+Buffer\+Spi\+Flash\+RK\+\_\+\+Automated\+Test.\+h}
+\hypertarget{_circular_buffer_spi_flash_r_k___automated_test_8h_source}{}\label{_circular_buffer_spi_flash_r_k___automated_test_8h_source}\index{src/CircularBufferSpiFlashRK\_AutomatedTest.h@{src/CircularBufferSpiFlashRK\_AutomatedTest.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{comment}{//\ This\ file\ is\ used\ by\ both\ automated-\/test\ (off-\/device)\ and\ examples/1-\/automated-\/test\ (on-\/device)}}
+\DoxyCodeLine{00004\ \textcolor{comment}{//\ It\ is\ not\ needed\ during\ normal\ operation}}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ "{}CircularBufferSpiFlashRK.h"{}}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{keywordtype}{void}\ test01(SpiFlash\ *spiFlash)\ \{}
+\DoxyCodeLine{00009\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ startAddr\ =\ 0;}
+\DoxyCodeLine{00010\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{size\_t}\ testSize\ =\ 1\ *\ 1024\ *\ 1024;}
+\DoxyCodeLine{00011\ \ \ \ \ }
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t}\ addr\ =\ startAddr;\ addr\ <\ startAddr\ +\ testSize;\ addr\ +=\ 4096)\ \{}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ spiFlash-\/>sectorErase(addr);}
+\DoxyCodeLine{00014\ \ \ \ \ \}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{comment}{//\ Check\ erase}}
+\DoxyCodeLine{00017\ \ \ \ \ uint8\_t\ tempBuf[256];}
+\DoxyCodeLine{00018\ \ \ \ \ uint8\_t\ expectedBuf[\textcolor{keyword}{sizeof}(tempBuf)];}
+\DoxyCodeLine{00019\ \ \ \ \ memset(expectedBuf,\ 0xff,\ \textcolor{keyword}{sizeof}(expectedBuf));}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t}\ addr\ =\ startAddr;\ addr\ <\ testSize;\ addr\ +=\ \textcolor{keyword}{sizeof}(tempBuf))\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ spiFlash-\/>readData(addr,\ tempBuf,\ \textcolor{keyword}{sizeof}(tempBuf));}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t}\ ii\ =\ 0;\ ii\ <\ \textcolor{keyword}{sizeof}(tempBuf);\ ii++)\ \{}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tempBuf[ii]\ !=\ 0xff)\ \{}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Log.error(\textcolor{stringliteral}{"{}test\ failed\ ii=\%d\ value=0x\%02x\ expected=0x\%02x\ line=\%d"{}},\ (\textcolor{keywordtype}{int})ii,\ (int)tempBuf[ii],\ (\textcolor{keywordtype}{int})expectedBuf[ii],\ (int)\_\_LINE\_\_);}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00028\ \ \ \ \ \}}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{comment}{//\ Check\ write}}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t}\ ii\ =\ 0;\ ii\ <\ \textcolor{keyword}{sizeof}(tempBuf);\ ii++)\ \{}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ tempBuf[ii]\ =\ expectedBuf[ii]\ =\ (uint8\_t)\ ii;}
+\DoxyCodeLine{00032\ \ \ \ \ \}}
+\DoxyCodeLine{00033\ \ \ \ \ spiFlash-\/>writeData(startAddr,\ tempBuf,\ \textcolor{keyword}{sizeof}(tempBuf));}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \ memset(tempBuf,\ 0,\ \textcolor{keyword}{sizeof}(tempBuf));}
+\DoxyCodeLine{00036\ \ \ \ \ spiFlash-\/>readData(startAddr,\ tempBuf,\ \textcolor{keyword}{sizeof}(tempBuf));}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t}\ ii\ =\ 0;\ ii\ <\ \textcolor{keyword}{sizeof}(tempBuf);\ ii++)\ \{}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tempBuf[ii]\ !=\ expectedBuf[ii])\ \{}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Log.error(\textcolor{stringliteral}{"{}test\ failed\ ii=\%d\ value=0x\%02x\ expected=0x\%02x\ line=\%d"{}},\ (\textcolor{keywordtype}{int})ii,\ (int)tempBuf[ii],\ (\textcolor{keywordtype}{int})expectedBuf[ii],\ (int)\_\_LINE\_\_);}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00042\ \ \ \ \ \}}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{comment}{//\ Check\ NOR\ flash\ semantics\ (can\ only\ set\ bit\ to\ 0)}}
+\DoxyCodeLine{00045\ \ \ \ \ tempBuf[0]\ =\ 0;\ \textcolor{comment}{//\ writes\ over\ 0x00}}
+\DoxyCodeLine{00046\ \ \ \ \ tempBuf[1]\ =\ 0;\ \textcolor{comment}{//\ writes\ over\ 0x01}}
+\DoxyCodeLine{00047\ \ \ \ \ tempBuf[2]\ =\ 0xff;\ \textcolor{comment}{//\ writes\ over\ 0x02}}
+\DoxyCodeLine{00048\ \ \ \ \ spiFlash-\/>writeData(startAddr,\ tempBuf,\ 3);}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ memset(tempBuf,\ 0xff,\ \textcolor{keyword}{sizeof}(tempBuf));}
+\DoxyCodeLine{00051\ \ \ \ \ expectedBuf[0]\ =\ 0;}
+\DoxyCodeLine{00052\ \ \ \ \ expectedBuf[1]\ =\ 0;}
+\DoxyCodeLine{00053\ \ \ \ \ expectedBuf[2]\ =\ 2;}
+\DoxyCodeLine{00054\ \ \ \ \ spiFlash-\/>readData(startAddr,\ tempBuf,\ 3);}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t}\ ii\ =\ 0;\ ii\ <\ 2;\ ii++)\ \{}
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tempBuf[ii]\ !=\ expectedBuf[ii])\ \{}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Log.error(\textcolor{stringliteral}{"{}test\ failed\ ii=\%d\ value=0x\%02x\ expected=0x\%02x\ line=\%d"{}},\ (\textcolor{keywordtype}{int})ii,\ (\textcolor{keywordtype}{int})tempBuf[ii],\ (\textcolor{keywordtype}{int})expectedBuf[ii],\ (\textcolor{keywordtype}{int})\_\_LINE\_\_);}
+\DoxyCodeLine{00058\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00060\ \ \ \ \ \}}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ spiFlash-\/>sectorErase(startAddr);}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \ Log.info(\textcolor{stringliteral}{"{}test01\ completed!"{}});}
+\DoxyCodeLine{00066\ \}}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ String\ makeRandomString(\textcolor{keywordtype}{size\_t}\ maxLen)\ \{}
+\DoxyCodeLine{00069\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}\ dict[]\ =\ \textcolor{stringliteral}{"{}abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"{}};}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \ \ \ \ \textcolor{keywordtype}{char}\ buf[maxLen\ +\ 1];\ \ \ \ }
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordtype}{int}\ stringLen\ =\ rand()\ \%\ maxLen;}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ charNum\ =\ 0;\ charNum\ <\ stringLen;\ charNum++)\ \{}
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ index\ =\ rand()\ \%\ \textcolor{keyword}{sizeof}(dict);}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ buf[charNum]\ =\ dict[index];}
+\DoxyCodeLine{00078\ \ \ \ \ \}}
+\DoxyCodeLine{00079\ \ \ \ \ buf[stringLen]\ =\ 0;}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keywordflow}{return}\ String(buf);}
+\DoxyCodeLine{00082\ \}}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \textcolor{keywordtype}{void}\ test02(SpiFlash\ *spiFlash)\ \{}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ testCount\ =\ 5000;}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ maxLen\ =\ 128;}
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ subTestSize\ =\ 20;}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{keyword}{const}\ uint16\_t\ sectorCount\ =\ 64;}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00091\ \ \ \ \ \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k}{CircularBufferSpiFlashRK}}\ circBuffer(spiFlash,\ 0,\ sectorCount\ *\ 4096);}
+\DoxyCodeLine{00092\ \ \ \ \ circBuffer.format();}
+\DoxyCodeLine{00093\ \ \ \ \ }
+\DoxyCodeLine{00094\ \ \ \ \ std::deque<String>\ strings;}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordtype}{int}\ stringsTested\ =\ 0;}
+\DoxyCodeLine{00097\ }
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t}\ testNum\ =\ 0;\ testNum\ <\ testCount;\ testNum++)\ \{}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\#ifndef\ UNITTEST}}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((testNum\ \%\ 25)\ ==\ 0)\ \{}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ Log.trace(\textcolor{stringliteral}{"{}test2\ \%d\ of\ \%d\ freeMem=\%d"{}},\ (\textcolor{keywordtype}{int})testNum,\ (\textcolor{keywordtype}{int})testCount,\ (\textcolor{keywordtype}{int})System.freeMemory());}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats}{CircularBufferSpiFlashRK::UsageStats}}\ stats;}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ \ \ \ \ circBuffer.getUsageStats(stats);}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ \ \ \ \ stats.\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_afa453adb1ffa0016791fd8cca762b157}{log}}(LOG\_LEVEL\_TRACE,\ \textcolor{stringliteral}{"{}test2"{}});}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00107\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ numToWrite\ =\ rand()\ \%\ subTestSize;}
+\DoxyCodeLine{00108\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ ii\ =\ 0;\ ii\ <\ numToWrite;\ ii++)\ \{}
+\DoxyCodeLine{00109\ \ \ \ \ \ \ \ \ \ \ \ \ String\ s\ =\ makeRandomString(maxLen);}
+\DoxyCodeLine{00110\ \ \ \ \ \ \ \ \ \ \ \ \ strings.push\_back(s);}
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{CircularBufferSpiFlashRK::DataBuffer}}\ origBuffer(s);}
+\DoxyCodeLine{00113\ \ \ \ \ \ \ \ \ \ \ \ \ circBuffer.writeData(origBuffer);}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ numToRead;}
+\DoxyCodeLine{00118\ }
+\DoxyCodeLine{00119\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats}{CircularBufferSpiFlashRK::UsageStats}}\ stats;}
+\DoxyCodeLine{00120\ \ \ \ \ \ \ \ \ circBuffer.getUsageStats(stats);}
+\DoxyCodeLine{00121\ }
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (stats.\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_a6dee8a23647a526e5087b7343e02d8ac}{recordCount}}\ !=\ strings.size())\ \{}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ \ \ \ \ Log.error(\textcolor{stringliteral}{"{}testNum=\%d\ stats.recordCount=\%d\ strings.size=\%d"{}},\ (\textcolor{keywordtype}{int})testNum,\ (\textcolor{keywordtype}{int})stats.\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_a6dee8a23647a526e5087b7343e02d8ac}{recordCount}},\ (\textcolor{keywordtype}{int})strings.size());}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (stats.\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_a6dee8a23647a526e5087b7343e02d8ac}{recordCount}}\ >\ 500)\ \{}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ \ \ \ \ Log.error(\textcolor{stringliteral}{"{}test2\ testNum=\%d\ records\ are\ growing\ uncontrollably"{}},\ (\textcolor{keywordtype}{int})testNum);}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ stats.\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_afa453adb1ffa0016791fd8cca762b157}{log}}(LOG\_LEVEL\_INFO,\ \textcolor{stringliteral}{"{}test2"{}});}
+\DoxyCodeLine{00128\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00129\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00130\ }
+\DoxyCodeLine{00131\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (stats.\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_a6dee8a23647a526e5087b7343e02d8ac}{recordCount}}\ ==\ 0)\ \{}
+\DoxyCodeLine{00132\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ This\ can\ happen\ if\ number\ of\ random\ writes\ was\ 0}}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{00134\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00135\ }
+\DoxyCodeLine{00136\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ ((rand()\ \%\ 4)\ ==\ 0)\ \{}
+\DoxyCodeLine{00137\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Don't\ read\ everything\ 1/4\ of\ the\ time}}
+\DoxyCodeLine{00138\ \ \ \ \ \ \ \ \ \ \ \ \ numToRead\ =\ rand()\ \%\ stats.\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_a6dee8a23647a526e5087b7343e02d8ac}{recordCount}};}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00140\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ Otherwise\ read\ everything}}
+\DoxyCodeLine{00142\ \ \ \ \ \ \ \ \ \ \ \ \ numToRead\ =\ stats.\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_a6dee8a23647a526e5087b7343e02d8ac}{recordCount}};}
+\DoxyCodeLine{00143\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00144\ }
+\DoxyCodeLine{00145\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int}\ ii\ =\ 0;\ ii\ <\ numToRead\ \&\&\ !strings.empty();\ ii++)\ \{\ \ \ \ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00146\ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_read_info}{CircularBufferSpiFlashRK::ReadInfo}}\ readInfo;}
+\DoxyCodeLine{00147\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (circBuffer.readData(readInfo))\ \{}
+\DoxyCodeLine{00148\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ circBuffer.markAsRead(readInfo);}
+\DoxyCodeLine{00149\ }
+\DoxyCodeLine{00150\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{CircularBufferSpiFlashRK::DataBuffer}}\ origBuffer(strings.front());}
+\DoxyCodeLine{00151\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ strings.pop\_front();}
+\DoxyCodeLine{00152\ }
+\DoxyCodeLine{00153\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (strcmp(origBuffer.c\_str(),\ readInfo.\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a18493df360febe932a3d5c24d0e85861}{c\_str}}())\ !=\ 0)\ \{}
+\DoxyCodeLine{00154\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Log.error(\textcolor{stringliteral}{"{}testNum=\%d\ ii=\%d"{}},\ (\textcolor{keywordtype}{int})testNum,\ (\textcolor{keywordtype}{int})ii);}
+\DoxyCodeLine{00155\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Log.info(\textcolor{stringliteral}{"{}got:\ \%s"{}},\ readInfo.\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer_a18493df360febe932a3d5c24d0e85861}{c\_str}}());}
+\DoxyCodeLine{00156\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Log.info(\textcolor{stringliteral}{"{}exp:\ \%s\(\backslash\)n"{}},\ origBuffer.c\_str());}
+\DoxyCodeLine{00157\ }
+\DoxyCodeLine{00158\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00159\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00160\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stringsTested++;}
+\DoxyCodeLine{00161\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{else}\ \{}
+\DoxyCodeLine{00163\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Log.info(\textcolor{stringliteral}{"{}read\ failed\ testNum=\%d\ ii=\%d"{}},\ (\textcolor{keywordtype}{int})testNum,\ (\textcolor{keywordtype}{int})ii);}
+\DoxyCodeLine{00164\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ stats.\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_afa453adb1ffa0016791fd8cca762b157}{log}}(LOG\_LEVEL\_TRACE,\ \textcolor{stringliteral}{"{}after\ read\ fail"{}});}
+\DoxyCodeLine{00165\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{break};}
+\DoxyCodeLine{00166\ \ \ \ \ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00167\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00168\ \ \ \ \ \}}
+\DoxyCodeLine{00169\ }
+\DoxyCodeLine{00170\ \ \ \ \ \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats}{CircularBufferSpiFlashRK::UsageStats}}\ stats;}
+\DoxyCodeLine{00171\ \ \ \ \ circBuffer.getUsageStats(stats);}
+\DoxyCodeLine{00172\ \ \ \ \ stats.\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats_afa453adb1ffa0016791fd8cca762b157}{log}}(LOG\_LEVEL\_INFO,\ \textcolor{stringliteral}{"{}after\ test2\ loop"{}});}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00174\ \ \ \ \ \textcolor{comment}{//\ Validate\ that\ completed\ buffer\ can\ be\ loaded\ again}}
+\DoxyCodeLine{00175\ \ \ \ \ \textcolor{keywordflow}{if}\ (!circBuffer.load())\ \{}
+\DoxyCodeLine{00176\ \ \ \ \ \ \ \ \ Log.error(\textcolor{stringliteral}{"{}test2\ could\ not\ reload"{}});\ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00177\ \ \ \ \ \}}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \ \ \ \ Log.info(\textcolor{stringliteral}{"{}test2\ complete\ stringsTested=\%d"{}},\ stringsTested);}
+\DoxyCodeLine{00180\ \}}
+\DoxyCodeLine{00181\ }
+\DoxyCodeLine{00182\ \textcolor{keywordtype}{void}\ runTestSuite(SpiFlash\ *spiFlash)\ \{}
+\DoxyCodeLine{00183\ \ \ \ \ Log.info(\textcolor{stringliteral}{"{}jedecId=\%06lx"{}},\ (\textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{long})\ spiFlash-\/>jedecIdRead());}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \ \ \ \ \textcolor{keywordflow}{if}\ (!spiFlash-\/>isValid())\ \{}
+\DoxyCodeLine{00186\ \ \ \ \ \ \ \ \ Log.error(\textcolor{stringliteral}{"{}no\ valid\ flash\ chip"{}});}
+\DoxyCodeLine{00187\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00188\ \ \ \ \ \}}
+\DoxyCodeLine{00189\ }
+\DoxyCodeLine{00190\ \ \ \ \ test01(spiFlash);}
+\DoxyCodeLine{00191\ \ \ \ \ test02(spiFlash);}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \}}
+
+\end{DoxyCode}

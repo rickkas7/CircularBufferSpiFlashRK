@@ -1,0 +1,39 @@
+\doxysection{Circular\+Buffer\+Spi\+Flash\+RK\+::Sector\+Common Struct Reference}
+\hypertarget{struct_circular_buffer_spi_flash_r_k_1_1_sector_common}{}\label{struct_circular_buffer_spi_flash_r_k_1_1_sector_common}\index{CircularBufferSpiFlashRK::SectorCommon@{CircularBufferSpiFlashRK::SectorCommon}}
+
+
+Data stored after the magic bytes in flash.  
+
+
+
+
+{\ttfamily \#include $<$Circular\+Buffer\+Spi\+Flash\+RK.\+h$>$}
+
+\doxysubsubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{struct_circular_buffer_spi_flash_r_k_1_1_sector_common_a35fb3ff156326fdbb955c942dbf2c096}\label{struct_circular_buffer_spi_flash_r_k_1_1_sector_common_a35fb3ff156326fdbb955c942dbf2c096} 
+uint32\+\_\+t {\bfseries sequence}
+\begin{DoxyCompactList}\small\item\em Monotonically increasing sequence number for sector used. \end{DoxyCompactList}\item 
+\Hypertarget{struct_circular_buffer_spi_flash_r_k_1_1_sector_common_aebb16fb5ef69b700df8294e428ef0b8d}\label{struct_circular_buffer_spi_flash_r_k_1_1_sector_common_aebb16fb5ef69b700df8294e428ef0b8d} 
+unsigned int {\bfseries flags}\+:4
+\begin{DoxyCompactList}\small\item\em Various flag bits. \end{DoxyCompactList}\item 
+\Hypertarget{struct_circular_buffer_spi_flash_r_k_1_1_sector_common_a1e4bf0be2ea09ab7992563e72a5e7cf6}\label{struct_circular_buffer_spi_flash_r_k_1_1_sector_common_a1e4bf0be2ea09ab7992563e72a5e7cf6} 
+unsigned int {\bfseries reserved}\+:7
+\begin{DoxyCompactList}\small\item\em Reserved for future use. \end{DoxyCompactList}\item 
+\Hypertarget{struct_circular_buffer_spi_flash_r_k_1_1_sector_common_af32ee7d735fff9e1531aa11612825f32}\label{struct_circular_buffer_spi_flash_r_k_1_1_sector_common_af32ee7d735fff9e1531aa11612825f32} 
+unsigned int {\bfseries record\+Count}\+:9
+\begin{DoxyCompactList}\small\item\em Number of records, set during finalize. \end{DoxyCompactList}\item 
+\Hypertarget{struct_circular_buffer_spi_flash_r_k_1_1_sector_common_a2f54cc367f63c395fb4e0ce2178482be}\label{struct_circular_buffer_spi_flash_r_k_1_1_sector_common_a2f54cc367f63c395fb4e0ce2178482be} 
+unsigned int {\bfseries data\+Size}\+:12
+\begin{DoxyCompactList}\small\item\em Number of bytes of data in records, set during finalize. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Data stored after the magic bytes in flash. 
+
+A copy of this is kept in RAM as well, so the library will use 8 bytes of RAM for each sector. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/Circular\+Buffer\+Spi\+Flash\+RK.\+h\end{DoxyCompactItemize}

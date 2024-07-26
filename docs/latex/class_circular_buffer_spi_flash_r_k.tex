@@ -1,0 +1,553 @@
+\doxysection{Circular\+Buffer\+Spi\+Flash\+RK Class Reference}
+\hypertarget{class_circular_buffer_spi_flash_r_k}{}\label{class_circular_buffer_spi_flash_r_k}\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}}
+\begin{DoxyCompactList}\small\item\em Class to hold a copy of data, either by pointer and length or a c-\/string. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_read_info}{Read\+Info}}
+\begin{DoxyCompactList}\small\item\em Structure used by read\+Data and mark\+As\+Read. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_record_common}{Record\+Common}}
+\begin{DoxyCompactList}\small\item\em Data stored in flash for each record in the sector. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}}
+\begin{DoxyCompactList}\small\item\em Information about a sector, stored in RAM. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_sector_common}{Sector\+Common}}
+\begin{DoxyCompactList}\small\item\em Data stored after the magic bytes in flash. \end{DoxyCompactList}\item 
+struct \mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_sector_header}{Sector\+Header}}
+\begin{DoxyCompactList}\small\item\em Structure store at the beginning of each sector. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats}{Usage\+Stats}}
+\begin{DoxyCompactList}\small\item\em Class for various stats about the circular buffer usage. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a2d47fda1b8d9d0542ae45bcfa9c5d894}\label{class_circular_buffer_spi_flash_r_k_a2d47fda1b8d9d0542ae45bcfa9c5d894} 
+struct \mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_record_common}{Circular\+Buffer\+Spi\+Flash\+RK\+::\+Record\+Common}} {\bfseries \+\_\+\+\_\+attribute\+\_\+\+\_\+} ((\+\_\+\+\_\+packed\+\_\+\+\_\+))
+\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_abda19780f555c2699e929a421d839eef}\label{class_circular_buffer_spi_flash_r_k_abda19780f555c2699e929a421d839eef} 
+struct \mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_sector_common}{Circular\+Buffer\+Spi\+Flash\+RK\+::\+Sector\+Common}} {\bfseries \+\_\+\+\_\+attribute\+\_\+\+\_\+} ((\+\_\+\+\_\+packed\+\_\+\+\_\+))
+\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_ad2b1e110ba5781153b85bdaca6025ba2}\label{class_circular_buffer_spi_flash_r_k_ad2b1e110ba5781153b85bdaca6025ba2} 
+struct \mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_sector_header}{Circular\+Buffer\+Spi\+Flash\+RK\+::\+Sector\+Header}} {\bfseries \+\_\+\+\_\+attribute\+\_\+\+\_\+} ((\+\_\+\+\_\+packed\+\_\+\+\_\+))
+\item 
+\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_af8247a646cef67d55a0b61b5dd6533ae}{Circular\+Buffer\+Spi\+Flash\+RK}} (Spi\+Flash \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a578b17b5feeb99c1ba0378e8726089b0}{spi\+Flash}}, size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a09e0d4304539dc46c9ae8cc111a32388}{addr\+Start}}, size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_abf699ab2202f8c1b93f3a806e6f6bd2a}{addr\+End}})
+\begin{DoxyCompactList}\small\item\em Construct a new circular buffer object. This is typically done as a global variable. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_aacdb38297a29247c2d93421cfdac69f0}\label{class_circular_buffer_spi_flash_r_k_aacdb38297a29247c2d93421cfdac69f0} 
+virtual {\bfseries \texorpdfstring{$\sim$}{\string~}\+Circular\+Buffer\+Spi\+Flash\+RK} ()
+\begin{DoxyCompactList}\small\item\em Destroy the object. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a8adb742373527d0dc3c1255357a863e5}{load}} ()
+\begin{DoxyCompactList}\small\item\em Load the metadata for the file system. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a60c23ebb59d7200219b31594ebcf7bbc}{format}} ()
+\begin{DoxyCompactList}\small\item\em Formats the file system. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a235738da1046644f12df4b002ea9e10b}{fsck}} (bool repair)
+\begin{DoxyCompactList}\small\item\em Perform a file system check. Not currently implemented! \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a5ab15276d9b4c507fea822cdada1e509}{read\+Data}} (\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_read_info}{Read\+Info}} \&read\+Info)
+\begin{DoxyCompactList}\small\item\em Read the next unread data from the circular buffer. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a170c22ff2b87535bde6fe70ace81734c}{mark\+As\+Read}} (const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_read_info}{Read\+Info}} \&read\+Info)
+\begin{DoxyCompactList}\small\item\em Mark the data from read\+Data as read. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a2b7c67e2849a53a5668f91b1f1770816}{write\+Data}} (const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&data)
+\begin{DoxyCompactList}\small\item\em Write data to the circular buffer. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a61bc4080818916c9912b94740a2c69ce}{get\+Usage\+Stats}} (\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats}{Usage\+Stats}} \&usage\+Stats)
+\begin{DoxyCompactList}\small\item\em Get the usage statistics. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a58b4dbe91cbf34d52edf4bd764bbe60e}{lock}} ()
+\begin{DoxyCompactList}\small\item\em Locks the mutex that protects shared resources. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a89b3df3d2620ff85ea450da20f011f31}{try\+Lock}} ()
+\begin{DoxyCompactList}\small\item\em Attempts to lock the mutex that protects shared resources. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a1c80016a21140072a0cab6eca6506bd3}\label{class_circular_buffer_spi_flash_r_k_a1c80016a21140072a0cab6eca6506bd3} 
+void {\bfseries unlock} ()
+\begin{DoxyCompactList}\small\item\em Unlocks the mutex that protects shared resources. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_afbb732c8d56c3f3b32227a18695e1e49}\label{class_circular_buffer_spi_flash_r_k_afbb732c8d56c3f3b32227a18695e1e49} 
+class \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Circular\+Buffer\+Spi\+Flash\+RK\+::\+Sector}} {\bfseries \+\_\+\+\_\+attribute\+\_\+\+\_\+}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a481d4144f760d2bd516c181e4d285251}{get\+Sector\+From\+Cache}} (uint16\+\_\+t sector\+Num)
+\begin{DoxyCompactList}\small\item\em Get the \doxylink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector} object for a sector if it exists in the cache. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}} \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a568538abd568f66774eb61a043e7d7d0}{get\+Sector}} (uint16\+\_\+t sector\+Num)
+\begin{DoxyCompactList}\small\item\em Get the \doxylink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector} object for a sector, allocating and reading it if not in the cache. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a478099fd1c72c70e454e5d1f7e42e049}{read\+Sector}} (uint16\+\_\+t sector\+Num, \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}} \texorpdfstring{$\ast$}{*}sector)
+\begin{DoxyCompactList}\small\item\em Used internally to read the data from SPI flash. Use \doxylink{class_circular_buffer_spi_flash_r_k_a568538abd568f66774eb61a043e7d7d0}{get\+Sector()} instead! \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_aa6acce5c09acca8c9aa0e292f46059e0}{write\+Sector\+Header}} (uint16\+\_\+t sector\+Num, bool erase, uint32\+\_\+t sequence)
+\begin{DoxyCompactList}\small\item\em Used internally to write a sector header. Use \doxylink{class_circular_buffer_spi_flash_r_k_a2b7c67e2849a53a5668f91b1f1770816}{write\+Data()} instead! \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_aa3a5dd4d8b3788e4303b352526654199}{append\+Data\+To\+Sector}} (\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}} \texorpdfstring{$\ast$}{*}sector, const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&data, uint16\+\_\+t flags)
+\begin{DoxyCompactList}\small\item\em Used internally to append data to an existing sector. Use \doxylink{class_circular_buffer_spi_flash_r_k_a2b7c67e2849a53a5668f91b1f1770816}{write\+Data()} instead! \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a3817217adba2e490573ecb55f5c66875}{finalize\+Sector}} (\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}} \texorpdfstring{$\ast$}{*}sector)
+\begin{DoxyCompactList}\small\item\em Used internally when a sector is full and a new sector needs to be used. Use \doxylink{class_circular_buffer_spi_flash_r_k_a2b7c67e2849a53a5668f91b1f1770816}{write\+Data()} instead! \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a86006434a834c159e32a23d15a1ee39b}{read\+Data\+From\+Sector}} (\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}} \texorpdfstring{$\ast$}{*}sector, size\+\_\+t index, \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&data, \mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_record_common}{Record\+Common}} \&meta)
+\begin{DoxyCompactList}\small\item\em Used internally to read a record from a sector. Use \doxylink{class_circular_buffer_spi_flash_r_k_a5ab15276d9b4c507fea822cdada1e509}{read\+Data()} instead! \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a19fcf83ed6b62ce020d765e55ab4b8fe}{validate\+Sector}} (\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}} \texorpdfstring{$\ast$}{*}p\+Sector)
+\begin{DoxyCompactList}\small\item\em Used internally to validate as sector. Only used for off-\/device unit tests. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a37099570a9af48568d710c66977a3312}{sequence\+To\+Sector\+Num}} (uint32\+\_\+t sequence, uint16\+\_\+t \&sector\+Num) const
+\begin{DoxyCompactList}\small\item\em Used internally to find a sector number for a sequence number. \end{DoxyCompactList}\item 
+uint32\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a4a40e8e4d190ef859d04377c5bc5e83a}{sector\+Num\+To\+Addr}} (uint16\+\_\+t sector\+Num) const
+\begin{DoxyCompactList}\small\item\em Convert a sector number to an address. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_aed362f2b86c41054437890134242d339}\label{class_circular_buffer_spi_flash_r_k_aed362f2b86c41054437890134242d339} 
+void {\bfseries clear\+Cache} ()
+\begin{DoxyCompactList}\small\item\em Remove entries from the sector cache. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a578b17b5feeb99c1ba0378e8726089b0}\label{class_circular_buffer_spi_flash_r_k_a578b17b5feeb99c1ba0378e8726089b0} 
+Spi\+Flash \texorpdfstring{$\ast$}{*} {\bfseries spi\+Flash}
+\begin{DoxyCompactList}\small\item\em The class to access the SPI flash chip. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a09e0d4304539dc46c9ae8cc111a32388}\label{class_circular_buffer_spi_flash_r_k_a09e0d4304539dc46c9ae8cc111a32388} 
+size\+\_\+t {\bfseries addr\+Start}
+\begin{DoxyCompactList}\small\item\em Address in SPI flash where circular buffer begins, must be sector aligned. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_abf699ab2202f8c1b93f3a806e6f6bd2a}\label{class_circular_buffer_spi_flash_r_k_abf699ab2202f8c1b93f3a806e6f6bd2a} 
+size\+\_\+t {\bfseries addr\+End}
+\begin{DoxyCompactList}\small\item\em Address in SPI flash where circular buffer ends, must be sector aligned. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a53ac0a6ad9a306eebd662ca45bc5c952}\label{class_circular_buffer_spi_flash_r_k_a53ac0a6ad9a306eebd662ca45bc5c952} 
+size\+\_\+t {\bfseries sector\+Count}
+\begin{DoxyCompactList}\small\item\em Calculated in constructor, number of sectors from addr\+Start to addr\+End. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a6dfb6fc1c16ecb3747ec582c63eff9d3}\label{class_circular_buffer_spi_flash_r_k_a6dfb6fc1c16ecb3747ec582c63eff9d3} 
+\mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_sector_common}{Sector\+Common}} \texorpdfstring{$\ast$}{*} {\bfseries sector\+Meta} = nullptr
+\begin{DoxyCompactList}\small\item\em Array of \doxylink{struct_circular_buffer_spi_flash_r_k_1_1_sector_common}{Sector\+Common} structures, one for each sector. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a71129a8c1f99f04194c48cac564a02f2}\label{class_circular_buffer_spi_flash_r_k_a71129a8c1f99f04194c48cac564a02f2} 
+bool {\bfseries is\+Valid} = false
+\begin{DoxyCompactList}\small\item\em true once \doxylink{class_circular_buffer_spi_flash_r_k_a8adb742373527d0dc3c1255357a863e5}{load()} or \doxylink{class_circular_buffer_spi_flash_r_k_a60c23ebb59d7200219b31594ebcf7bbc}{format()} has been called and is successful \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a062364dffc6f299317bbb093519050ed}\label{class_circular_buffer_spi_flash_r_k_a062364dffc6f299317bbb093519050ed} 
+std\+::deque$<$ \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}} \texorpdfstring{$\ast$}{*} $>$ {\bfseries sector\+Cache}
+\begin{DoxyCompactList}\small\item\em Cache used by \doxylink{class_circular_buffer_spi_flash_r_k_a568538abd568f66774eb61a043e7d7d0}{get\+Sector()} \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_af80549fd6874d1b54b702625a6238de1}\label{class_circular_buffer_spi_flash_r_k_af80549fd6874d1b54b702625a6238de1} 
+uint32\+\_\+t {\bfseries first\+Sequence} = 0
+\begin{DoxyCompactList}\small\item\em Sequence number of read from. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a986083e8e9d153e217bb3cf882bd50d6}\label{class_circular_buffer_spi_flash_r_k_a986083e8e9d153e217bb3cf882bd50d6} 
+uint32\+\_\+t {\bfseries write\+Sequence} = 0
+\begin{DoxyCompactList}\small\item\em Sequence number to write to. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_ab0cb6344b834a5f9fbf3fa2b7ba1600c}\label{class_circular_buffer_spi_flash_r_k_ab0cb6344b834a5f9fbf3fa2b7ba1600c} 
+uint32\+\_\+t {\bfseries last\+Sequence} = 0
+\begin{DoxyCompactList}\small\item\em Last sequence number used. \end{DoxyCompactList}\item 
+os\+\_\+mutex\+\_\+recursive\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_a8904f39e18d5a6782ddae2beb4173607}{mutex}} = 0
+\begin{DoxyCompactList}\small\item\em Mutex to protect shared resources. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_ad17c2ee2a4b2cbf4d2bfa9ab024bddaa}\label{class_circular_buffer_spi_flash_r_k_ad17c2ee2a4b2cbf4d2bfa9ab024bddaa} 
+static const uint32\+\_\+t {\bfseries SECTOR\+\_\+\+MAGIC} = 0x0ceb6443
+\begin{DoxyCompactList}\small\item\em Magic bytes stored at beginning of \doxylink{struct_circular_buffer_spi_flash_r_k_1_1_sector_header}{Sector\+Header} structure. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a70d27b412e85cc35b367fe2cade1b299}\label{class_circular_buffer_spi_flash_r_k_a70d27b412e85cc35b367fe2cade1b299} 
+static const uint32\+\_\+t {\bfseries SECTOR\+\_\+\+MAGIC\+\_\+\+ERASED} = 0xffffffff
+\begin{DoxyCompactList}\small\item\em Magic bytes value if the sector is erased and not formatted. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_aa6572d4ee56457e6afd87f76bd25a832}\label{class_circular_buffer_spi_flash_r_k_aa6572d4ee56457e6afd87f76bd25a832} 
+static const unsigned int {\bfseries SECTOR\+\_\+\+FLAG\+\_\+\+STARTED\+\_\+\+MASK} = 0x01
+\begin{DoxyCompactList}\small\item\em Bit that is cleared when a sector is first written to after formatting. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a6ac4189de4e4b04d63815188a139cc5e}\label{class_circular_buffer_spi_flash_r_k_a6ac4189de4e4b04d63815188a139cc5e} 
+static const unsigned int {\bfseries SECTOR\+\_\+\+FLAG\+\_\+\+FINALIZED\+\_\+\+MASK} = 0x02
+\begin{DoxyCompactList}\small\item\em Bit that is cleared when a sector has been fully written to. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a5912ad454fc0c21838f6ff3cfc7b11eb}\label{class_circular_buffer_spi_flash_r_k_a5912ad454fc0c21838f6ff3cfc7b11eb} 
+static const unsigned int {\bfseries SECTOR\+\_\+\+FLAG\+\_\+\+CORRUPTED\+\_\+\+MASK} = 0x04
+\begin{DoxyCompactList}\small\item\em Bit that is cleared when a sector has invalid record structures. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a16e43d7fa6438a628d3fdba6c31bc503}\label{class_circular_buffer_spi_flash_r_k_a16e43d7fa6438a628d3fdba6c31bc503} 
+static const unsigned int {\bfseries RECORD\+\_\+\+SIZE\+\_\+\+ERASED} = 0xfff
+\begin{DoxyCompactList}\small\item\em Record size value when there is no record at this location. This is the value of the 12-\/bit value when the sector is erased. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a82930c5b6f874f67ce420c988e9f52be}\label{class_circular_buffer_spi_flash_r_k_a82930c5b6f874f67ce420c988e9f52be} 
+static const unsigned int {\bfseries RECORD\+\_\+\+FLAG\+\_\+\+READ\+\_\+\+MASK} = 0x1
+\begin{DoxyCompactList}\small\item\em Bit that is cleared when a record has been read. \end{DoxyCompactList}\item 
+static const size\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_ac6f99a80a69cdb6e1fb59891fe962dd7}{SECTOR\+\_\+\+CACHE\+\_\+\+SIZE}} = 8
+\begin{DoxyCompactList}\small\item\em Number of cached \doxylink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector} structures used by get\+Sector. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_af8247a646cef67d55a0b61b5dd6533ae}\label{class_circular_buffer_spi_flash_r_k_af8247a646cef67d55a0b61b5dd6533ae} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{CircularBufferSpiFlashRK()}{CircularBufferSpiFlashRK()}}
+{\footnotesize\ttfamily Circular\+Buffer\+Spi\+Flash\+RK\+::\+Circular\+Buffer\+Spi\+Flash\+RK (\begin{DoxyParamCaption}\item[{Spi\+Flash \texorpdfstring{$\ast$}{*}}]{spi\+Flash,  }\item[{size\+\_\+t}]{addr\+Start,  }\item[{size\+\_\+t}]{addr\+End }\end{DoxyParamCaption})}
+
+
+
+Construct a new circular buffer object. This is typically done as a global variable. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em spi\+Flash} & The Spi\+Flash\+RK object for the SPI NOR flash chip. \\
+\hline
+{\em addr\+Start} & Address to start at (typically 0). Must be sector aligned (multiple of 4096 bytes). \\
+\hline
+{\em addr\+End} & Address to end at (not inclusive). Must be sector aligned (multiple of 4096 bytes). \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_aa3a5dd4d8b3788e4303b352526654199}\label{class_circular_buffer_spi_flash_r_k_aa3a5dd4d8b3788e4303b352526654199} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!appendDataToSector@{appendDataToSector}}
+\index{appendDataToSector@{appendDataToSector}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{appendDataToSector()}{appendDataToSector()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::append\+Data\+To\+Sector (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}} \texorpdfstring{$\ast$}{*}}]{sector,  }\item[{const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&}]{data,  }\item[{uint16\+\_\+t}]{flags }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Used internally to append data to an existing sector. Use \doxylink{class_circular_buffer_spi_flash_r_k_a2b7c67e2849a53a5668f91b1f1770816}{write\+Data()} instead! 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sector} & \\
+\hline
+{\em data} & \\
+\hline
+{\em flags} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true on success or false on failure 
+\end{DoxyReturn}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a3817217adba2e490573ecb55f5c66875}\label{class_circular_buffer_spi_flash_r_k_a3817217adba2e490573ecb55f5c66875} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!finalizeSector@{finalizeSector}}
+\index{finalizeSector@{finalizeSector}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{finalizeSector()}{finalizeSector()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::finalize\+Sector (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}} \texorpdfstring{$\ast$}{*}}]{sector }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Used internally when a sector is full and a new sector needs to be used. Use \doxylink{class_circular_buffer_spi_flash_r_k_a2b7c67e2849a53a5668f91b1f1770816}{write\+Data()} instead! 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sector} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true on success or false on failure 
+\end{DoxyReturn}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a60c23ebb59d7200219b31594ebcf7bbc}\label{class_circular_buffer_spi_flash_r_k_a60c23ebb59d7200219b31594ebcf7bbc} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!format@{format}}
+\index{format@{format}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{format()}{format()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::format (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Formats the file system. 
+
+\begin{DoxyReturn}{Returns}
+true on success or false on failure
+\end{DoxyReturn}
+This will erase every sector and write an empty file structure to it. This must be done if the file system is invalid or erased. \Hypertarget{class_circular_buffer_spi_flash_r_k_a235738da1046644f12df4b002ea9e10b}\label{class_circular_buffer_spi_flash_r_k_a235738da1046644f12df4b002ea9e10b} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!fsck@{fsck}}
+\index{fsck@{fsck}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{fsck()}{fsck()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::fsck (\begin{DoxyParamCaption}\item[{bool}]{repair }\end{DoxyParamCaption})}
+
+
+
+Perform a file system check. Not currently implemented! 
+
+
+\begin{DoxyParams}{Parameters}
+{\em repair} & True to attempt to repair a damaged circular buffer. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true on success or false on failure 
+\end{DoxyReturn}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a568538abd568f66774eb61a043e7d7d0}\label{class_circular_buffer_spi_flash_r_k_a568538abd568f66774eb61a043e7d7d0} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!getSector@{getSector}}
+\index{getSector@{getSector}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{getSector()}{getSector()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Circular\+Buffer\+Spi\+Flash\+RK\+::\+Sector}} \texorpdfstring{$\ast$}{*} Circular\+Buffer\+Spi\+Flash\+RK\+::get\+Sector (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{sector\+Num }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Get the \doxylink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector} object for a sector, allocating and reading it if not in the cache. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sector\+Num} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Sector\texorpdfstring{$\ast$}{*}
+\end{DoxyReturn}
+The \doxylink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector} object is just the metadata and an index of the records in it. It does not contain a copy of the data, so it\textquotesingle{}s relatively small.
+
+Do not delete the object returned by this method; it\textquotesingle{}s owned by the cache and is not a copy! \Hypertarget{class_circular_buffer_spi_flash_r_k_a481d4144f760d2bd516c181e4d285251}\label{class_circular_buffer_spi_flash_r_k_a481d4144f760d2bd516c181e4d285251} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!getSectorFromCache@{getSectorFromCache}}
+\index{getSectorFromCache@{getSectorFromCache}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{getSectorFromCache()}{getSectorFromCache()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Circular\+Buffer\+Spi\+Flash\+RK\+::\+Sector}} \texorpdfstring{$\ast$}{*} Circular\+Buffer\+Spi\+Flash\+RK\+::get\+Sector\+From\+Cache (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{sector\+Num }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Get the \doxylink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector} object for a sector if it exists in the cache. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sector\+Num} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Sector\texorpdfstring{$\ast$}{*} Object if it exists, or nullptr if not
+\end{DoxyReturn}
+The \doxylink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector} object is just the metadata and an index of the records in it. It does not contain a copy of the data, so it\textquotesingle{}s relatively small.
+
+Do not delete the object returned by this method; it\textquotesingle{}s owned by the cache and is not a copy! \Hypertarget{class_circular_buffer_spi_flash_r_k_a61bc4080818916c9912b94740a2c69ce}\label{class_circular_buffer_spi_flash_r_k_a61bc4080818916c9912b94740a2c69ce} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!getUsageStats@{getUsageStats}}
+\index{getUsageStats@{getUsageStats}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{getUsageStats()}{getUsageStats()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::get\+Usage\+Stats (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_usage_stats}{Usage\+Stats}} \&}]{usage\+Stats }\end{DoxyParamCaption})}
+
+
+
+Get the usage statistics. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em usage\+Stats} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true on success or false on failure
+\end{DoxyReturn}
+This method isn\textquotesingle{}t const because it needs to obtain a lock on this object. \Hypertarget{class_circular_buffer_spi_flash_r_k_a8adb742373527d0dc3c1255357a863e5}\label{class_circular_buffer_spi_flash_r_k_a8adb742373527d0dc3c1255357a863e5} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!load@{load}}
+\index{load@{load}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{load()}{load()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::load (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Load the metadata for the file system. 
+
+\begin{DoxyReturn}{Returns}
+true on success or false on failure
+\end{DoxyReturn}
+You must do this (or format) before using the file system. If this function returns false the format is not valid and you should format it. \Hypertarget{class_circular_buffer_spi_flash_r_k_a58b4dbe91cbf34d52edf4bd764bbe60e}\label{class_circular_buffer_spi_flash_r_k_a58b4dbe91cbf34d52edf4bd764bbe60e} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!lock@{lock}}
+\index{lock@{lock}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{lock()}{lock()}}
+{\footnotesize\ttfamily void Circular\+Buffer\+Spi\+Flash\+RK\+::lock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Locks the mutex that protects shared resources. 
+
+This is compatible with {\ttfamily WITH\+\_\+\+LOCK(\texorpdfstring{$\ast$}{*}this)}.
+
+The mutex is not recursive so do not lock it within a locked section. \Hypertarget{class_circular_buffer_spi_flash_r_k_a170c22ff2b87535bde6fe70ace81734c}\label{class_circular_buffer_spi_flash_r_k_a170c22ff2b87535bde6fe70ace81734c} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!markAsRead@{markAsRead}}
+\index{markAsRead@{markAsRead}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{markAsRead()}{markAsRead()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::mark\+As\+Read (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_read_info}{Read\+Info}} \&}]{read\+Info }\end{DoxyParamCaption})}
+
+
+
+Mark the data from read\+Data as read. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em read\+Info} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true on success or false on failure
+\end{DoxyReturn}
+This method works properly even if the sector was overwritten because the buffer was full and additional data was written to it. It will ignore the mark as read in this case, because the data no longer exists. \Hypertarget{class_circular_buffer_spi_flash_r_k_a5ab15276d9b4c507fea822cdada1e509}\label{class_circular_buffer_spi_flash_r_k_a5ab15276d9b4c507fea822cdada1e509} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!readData@{readData}}
+\index{readData@{readData}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{readData()}{readData()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::read\+Data (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_read_info}{Read\+Info}} \&}]{read\+Info }\end{DoxyParamCaption})}
+
+
+
+Read the next unread data from the circular buffer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em read\+Info} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true on success or false on failure
+\end{DoxyReturn}
+After reading the data, you must pass the same read\+Info to mark\+As\+Read otherwise you\textquotesingle{}ll read the same data again. \Hypertarget{class_circular_buffer_spi_flash_r_k_a86006434a834c159e32a23d15a1ee39b}\label{class_circular_buffer_spi_flash_r_k_a86006434a834c159e32a23d15a1ee39b} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!readDataFromSector@{readDataFromSector}}
+\index{readDataFromSector@{readDataFromSector}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{readDataFromSector()}{readDataFromSector()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::read\+Data\+From\+Sector (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}} \texorpdfstring{$\ast$}{*}}]{sector,  }\item[{size\+\_\+t}]{index,  }\item[{\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&}]{data,  }\item[{\mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_record_common}{Record\+Common}} \&}]{meta }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Used internally to read a record from a sector. Use \doxylink{class_circular_buffer_spi_flash_r_k_a5ab15276d9b4c507fea822cdada1e509}{read\+Data()} instead! 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sector} & \\
+\hline
+{\em index} & \\
+\hline
+{\em data} & \\
+\hline
+{\em meta} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true on success or false on failure 
+\end{DoxyReturn}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a478099fd1c72c70e454e5d1f7e42e049}\label{class_circular_buffer_spi_flash_r_k_a478099fd1c72c70e454e5d1f7e42e049} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!readSector@{readSector}}
+\index{readSector@{readSector}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{readSector()}{readSector()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::read\+Sector (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{sector\+Num,  }\item[{\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}} \texorpdfstring{$\ast$}{*}}]{sector }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Used internally to read the data from SPI flash. Use \doxylink{class_circular_buffer_spi_flash_r_k_a568538abd568f66774eb61a043e7d7d0}{get\+Sector()} instead! 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sector\+Num} & \\
+\hline
+{\em sector} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true on success or false on failure 
+\end{DoxyReturn}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a4a40e8e4d190ef859d04377c5bc5e83a}\label{class_circular_buffer_spi_flash_r_k_a4a40e8e4d190ef859d04377c5bc5e83a} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!sectorNumToAddr@{sectorNumToAddr}}
+\index{sectorNumToAddr@{sectorNumToAddr}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{sectorNumToAddr()}{sectorNumToAddr()}}
+{\footnotesize\ttfamily uint32\+\_\+t Circular\+Buffer\+Spi\+Flash\+RK\+::sector\+Num\+To\+Addr (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{sector\+Num }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [protected]}}
+
+
+
+Convert a sector number to an address. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sector\+Num} & 0 is the first sector of this buffer, not the device! \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+uint32\+\_\+t The byte address in in the device for the beginning of this sector 
+\end{DoxyReturn}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a37099570a9af48568d710c66977a3312}\label{class_circular_buffer_spi_flash_r_k_a37099570a9af48568d710c66977a3312} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!sequenceToSectorNum@{sequenceToSectorNum}}
+\index{sequenceToSectorNum@{sequenceToSectorNum}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{sequenceToSectorNum()}{sequenceToSectorNum()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::sequence\+To\+Sector\+Num (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{sequence,  }\item[{uint16\+\_\+t \&}]{sector\+Num }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Used internally to find a sector number for a sequence number. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sequence} & \\
+\hline
+{\em sector\+Num} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true on success or false on failure 
+\end{DoxyReturn}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a89b3df3d2620ff85ea450da20f011f31}\label{class_circular_buffer_spi_flash_r_k_a89b3df3d2620ff85ea450da20f011f31} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!tryLock@{tryLock}}
+\index{tryLock@{tryLock}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{tryLock()}{tryLock()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::try\+Lock (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Attempts to lock the mutex that protects shared resources. 
+
+\begin{DoxyReturn}{Returns}
+true if the mutex was locked or false if it was busy already. 
+\end{DoxyReturn}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a19fcf83ed6b62ce020d765e55ab4b8fe}\label{class_circular_buffer_spi_flash_r_k_a19fcf83ed6b62ce020d765e55ab4b8fe} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!validateSector@{validateSector}}
+\index{validateSector@{validateSector}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{validateSector()}{validateSector()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::validate\+Sector (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector}} \texorpdfstring{$\ast$}{*}}]{p\+Sector }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Used internally to validate as sector. Only used for off-\/device unit tests. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Sector} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true on success or false on failure
+\end{DoxyReturn}
+This method validates all of the fields in the sector and assures that the data on flash matches the internal cache. It\textquotesingle{}s only used during off-\/device unit tests, and will assert if the sector is not valid.
+
+On-\/device it just always returns true. \Hypertarget{class_circular_buffer_spi_flash_r_k_a2b7c67e2849a53a5668f91b1f1770816}\label{class_circular_buffer_spi_flash_r_k_a2b7c67e2849a53a5668f91b1f1770816} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!writeData@{writeData}}
+\index{writeData@{writeData}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{writeData()}{writeData()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::write\+Data (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_data_buffer}{Data\+Buffer}} \&}]{data }\end{DoxyParamCaption})}
+
+
+
+Write data to the circular buffer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true on success or false on failure
+\end{DoxyReturn}
+Data is always written to the buffer. If the circular buffer is full, the oldest sector is deleted to make room for new data.
+
+If there is a read in progress on the oldest sector, it will continue, however a mark\+As\+Read will be ignored since the underlying data will already have been deleted. \Hypertarget{class_circular_buffer_spi_flash_r_k_aa6acce5c09acca8c9aa0e292f46059e0}\label{class_circular_buffer_spi_flash_r_k_aa6acce5c09acca8c9aa0e292f46059e0} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!writeSectorHeader@{writeSectorHeader}}
+\index{writeSectorHeader@{writeSectorHeader}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{writeSectorHeader()}{writeSectorHeader()}}
+{\footnotesize\ttfamily bool Circular\+Buffer\+Spi\+Flash\+RK\+::write\+Sector\+Header (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{sector\+Num,  }\item[{bool}]{erase,  }\item[{uint32\+\_\+t}]{sequence }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Used internally to write a sector header. Use \doxylink{class_circular_buffer_spi_flash_r_k_a2b7c67e2849a53a5668f91b1f1770816}{write\+Data()} instead! 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sector\+Num} & \\
+\hline
+{\em erase} & \\
+\hline
+{\em sequence} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true on success or false on failure 
+\end{DoxyReturn}
+
+
+\doxysubsection{Field Documentation}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_a8904f39e18d5a6782ddae2beb4173607}\label{class_circular_buffer_spi_flash_r_k_a8904f39e18d5a6782ddae2beb4173607} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!mutex@{mutex}}
+\index{mutex@{mutex}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{mutex}{mutex}}
+{\footnotesize\ttfamily os\+\_\+mutex\+\_\+recursive\+\_\+t Circular\+Buffer\+Spi\+Flash\+RK\+::mutex = 0\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Mutex to protect shared resources. 
+
+This is initialized in setup() so make sure you call the setup() method from the global application setup. \Hypertarget{class_circular_buffer_spi_flash_r_k_ac6f99a80a69cdb6e1fb59891fe962dd7}\label{class_circular_buffer_spi_flash_r_k_ac6f99a80a69cdb6e1fb59891fe962dd7} 
+\index{CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}!SECTOR\_CACHE\_SIZE@{SECTOR\_CACHE\_SIZE}}
+\index{SECTOR\_CACHE\_SIZE@{SECTOR\_CACHE\_SIZE}!CircularBufferSpiFlashRK@{CircularBufferSpiFlashRK}}
+\doxysubsubsection{\texorpdfstring{SECTOR\_CACHE\_SIZE}{SECTOR\_CACHE\_SIZE}}
+{\footnotesize\ttfamily const size\+\_\+t Circular\+Buffer\+Spi\+Flash\+RK\+::\+SECTOR\+\_\+\+CACHE\+\_\+\+SIZE = 8\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [protected]}}
+
+
+
+Number of cached \doxylink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector} structures used by get\+Sector. 
+
+The \doxylink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector} structure does not contain the data, so this is not a lot of RAM, but can add up especially if you are storing small records because there\textquotesingle{}s a vector of \doxylink{struct_circular_buffer_spi_flash_r_k_1_1_record_common}{Record\+Common} structures, one for each record.
+
+The cache exists because indexing a \doxylink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector} requires n + 2 SPI reads where n is the number of records, so this can be a lot of transactions if you have small records. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/Circular\+Buffer\+Spi\+Flash\+RK.\+h\item 
+src/Circular\+Buffer\+Spi\+Flash\+RK.\+cpp\end{DoxyCompactItemize}

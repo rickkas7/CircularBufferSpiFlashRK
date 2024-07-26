@@ -1,0 +1,99 @@
+\doxysection{Circular\+Buffer\+Spi\+Flash\+RK\+::Sector Class Reference}
+\hypertarget{class_circular_buffer_spi_flash_r_k_1_1_sector}{}\label{class_circular_buffer_spi_flash_r_k_1_1_sector}\index{CircularBufferSpiFlashRK::Sector@{CircularBufferSpiFlashRK::Sector}}
+
+
+Information about a sector, stored in RAM.  
+
+
+
+
+{\ttfamily \#include $<$Circular\+Buffer\+Spi\+Flash\+RK.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector_aabcc94dcad042d2aac68aaf9a82640b8}{clear}} (uint16\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector_adbd94290d637f27f9d9baaf79f0ce96b}{sector\+Num}}=0)
+\begin{DoxyCompactList}\small\item\em Clear the records vector and common data. \end{DoxyCompactList}\item 
+uint16\+\_\+t \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector_a7d487e3f6b78e685131fc6e4ec896d33}{get\+Last\+Offset}} () const
+\begin{DoxyCompactList}\small\item\em Get the offset within the sector after the last record. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{class_circular_buffer_spi_flash_r_k_1_1_sector_a5d2af200397f87c9ecb85cabc44121a5}{log}} (Log\+Level level, const char \texorpdfstring{$\ast$}{*}msg, bool include\+Data=false) const
+\begin{DoxyCompactList}\small\item\em Log information about the sector to \+\_\+log. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_sector_adbd94290d637f27f9d9baaf79f0ce96b}\label{class_circular_buffer_spi_flash_r_k_1_1_sector_adbd94290d637f27f9d9baaf79f0ce96b} 
+uint16\+\_\+t {\bfseries sector\+Num} = 0
+\begin{DoxyCompactList}\small\item\em \doxylink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector} number this object contains. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_sector_ae1cf4535a4c38b98dee9370f2ae44b66}\label{class_circular_buffer_spi_flash_r_k_1_1_sector_ae1cf4535a4c38b98dee9370f2ae44b66} 
+std\+::vector$<$ \mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_record_common}{Record\+Common}} $>$ {\bfseries records}
+\begin{DoxyCompactList}\small\item\em The \doxylink{struct_circular_buffer_spi_flash_r_k_1_1_record_common}{Record\+Common} structure for each record in this sector. \end{DoxyCompactList}\item 
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_sector_a5d7999fc1e2d1f28f1e3982faeb669e9}\label{class_circular_buffer_spi_flash_r_k_1_1_sector_a5d7999fc1e2d1f28f1e3982faeb669e9} 
+\mbox{\hyperlink{struct_circular_buffer_spi_flash_r_k_1_1_sector_common}{Sector\+Common}} {\bfseries c}
+\begin{DoxyCompactList}\small\item\em The \doxylink{struct_circular_buffer_spi_flash_r_k_1_1_sector_common}{Sector\+Common} structure for this sector. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Information about a sector, stored in RAM. 
+
+This class is instantiated and owned by \doxylink{class_circular_buffer_spi_flash_r_k_a568538abd568f66774eb61a043e7d7d0}{get\+Sector()} which manages the object lifetime. Do not delete an instance of this class directly.
+
+The main reason for this class is that records are packed sequentially into a sector. In order to access the records efficiently, the \doxylink{class_circular_buffer_spi_flash_r_k_1_1_sector}{Sector} class builds an index in RAM. This requires an SPI read for each record.
+
+This is done per-\/sector, since an index of every sector could be very large.
+
+The sector class does not contain the data in the sector, so this class is relatively small (not the fully 4096 byte sector). 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_sector_aabcc94dcad042d2aac68aaf9a82640b8}\label{class_circular_buffer_spi_flash_r_k_1_1_sector_aabcc94dcad042d2aac68aaf9a82640b8} 
+\index{CircularBufferSpiFlashRK::Sector@{CircularBufferSpiFlashRK::Sector}!clear@{clear}}
+\index{clear@{clear}!CircularBufferSpiFlashRK::Sector@{CircularBufferSpiFlashRK::Sector}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily void Circular\+Buffer\+Spi\+Flash\+RK\+::\+Sector\+::clear (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{sector\+Num = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+
+
+Clear the records vector and common data. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sector\+Num} & \\
+\hline
+\end{DoxyParams}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_sector_a7d487e3f6b78e685131fc6e4ec896d33}\label{class_circular_buffer_spi_flash_r_k_1_1_sector_a7d487e3f6b78e685131fc6e4ec896d33} 
+\index{CircularBufferSpiFlashRK::Sector@{CircularBufferSpiFlashRK::Sector}!getLastOffset@{getLastOffset}}
+\index{getLastOffset@{getLastOffset}!CircularBufferSpiFlashRK::Sector@{CircularBufferSpiFlashRK::Sector}}
+\doxysubsubsection{\texorpdfstring{getLastOffset()}{getLastOffset()}}
+{\footnotesize\ttfamily uint16\+\_\+t Circular\+Buffer\+Spi\+Flash\+RK\+::\+Sector\+::get\+Last\+Offset (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+Get the offset within the sector after the last record. 
+
+\begin{DoxyReturn}{Returns}
+uint16\+\_\+t 
+\end{DoxyReturn}
+\Hypertarget{class_circular_buffer_spi_flash_r_k_1_1_sector_a5d2af200397f87c9ecb85cabc44121a5}\label{class_circular_buffer_spi_flash_r_k_1_1_sector_a5d2af200397f87c9ecb85cabc44121a5} 
+\index{CircularBufferSpiFlashRK::Sector@{CircularBufferSpiFlashRK::Sector}!log@{log}}
+\index{log@{log}!CircularBufferSpiFlashRK::Sector@{CircularBufferSpiFlashRK::Sector}}
+\doxysubsubsection{\texorpdfstring{log()}{log()}}
+{\footnotesize\ttfamily void Circular\+Buffer\+Spi\+Flash\+RK\+::\+Sector\+::log (\begin{DoxyParamCaption}\item[{Log\+Level}]{level,  }\item[{const char \texorpdfstring{$\ast$}{*}}]{msg,  }\item[{bool}]{include\+Data = {\ttfamily false} }\end{DoxyParamCaption}) const}
+
+
+
+Log information about the sector to \+\_\+log. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em level} & The log level, such as LOG\+\_\+\+LEVEL\+\_\+\+TRACE or LOG\+\_\+\+LEVEL\+\_\+\+INFO \\
+\hline
+{\em msg} & A message to insert at the beginning of the log message \\
+\hline
+{\em include\+Data} & Not currently used \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/Circular\+Buffer\+Spi\+Flash\+RK.\+h\item 
+src/Circular\+Buffer\+Spi\+Flash\+RK.\+cpp\end{DoxyCompactItemize}
