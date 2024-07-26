@@ -119,6 +119,14 @@ void test02(SpiFlash *spiFlash) {
         CircularBufferSpiFlashRK::UsageStats stats;
         circBuffer.getUsageStats(stats);
 
+        if (stats.recordCount != strings.size()) {
+            Log.error("testNum=%d stats.recordCount=%d strings.size=%d", (int)testNum, (int)stats.recordCount, (int)strings.size());
+        }
+        if (stats.recordCount > 500) {
+            Log.error("test2 testNum=%d records are growing uncontrollably", (int)testNum);
+            break;
+        }
+
         if (stats.recordCount == 0) {
             // This can happen if number of random writes was 0
             continue;
@@ -151,10 +159,17 @@ void test02(SpiFlash *spiFlash) {
                 stringsTested++;
             }
             else {
-                break;
+                //Log.info("read failed testNum=%d ii=%d", (int)testNum, (int)ii);
+                //stats.log(LOG_LEVEL_TRACE, "after read fail");
+                // break;
             }
         }
     }
+
+    CircularBufferSpiFlashRK::UsageStats stats;
+    circBuffer.getUsageStats(stats);
+    stats.log(LOG_LEVEL_INFO, "after test2 loop");
+
 
     // Validate that completed buffer can be loaded again
     if (!circBuffer.load()) {
