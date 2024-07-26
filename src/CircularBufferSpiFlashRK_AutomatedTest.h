@@ -128,7 +128,7 @@ void test02(SpiFlash *spiFlash) {
             numToRead = stats.recordCount;
         }
 
-        for(int ii = 0; ii < numToRead; ii++) {
+        for(int ii = 0; ii < numToRead && !strings.empty(); ii++) {            
             CircularBufferSpiFlashRK::ReadInfo readInfo;
             if (circBuffer.readData(readInfo)) {
                 circBuffer.markAsRead(readInfo);
