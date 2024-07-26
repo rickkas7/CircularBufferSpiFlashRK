@@ -580,7 +580,7 @@ bool CircularBufferSpiFlashRK::readData(ReadInfo &readInfo) {
             if (firstSequence < lastSequence) {
                 // Move to the next sector
                 firstSequence++;
-                _log.trace("%s advancing to next sector %d", (int)firstSequence);
+                _log.trace("%s advancing to next sector %d", "readData", (int)firstSequence);
             }
         }
 
